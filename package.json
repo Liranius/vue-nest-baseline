@@ -1,20 +1,40 @@
 {
-  "name": "@org/source",
+  "name": "@baseline/source",
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {},
   "private": true,
-  "dependencies": {},
+  "packageManager": "pnpm@12.4.2",
   "devDependencies": {
+    "@nx/devkit": "24.0.0",
     "@nx/js": "24.0.0",
+    "@nx/oxlint": "24.0.0",
+    "@nx/playwright": "24.0.0",
+    "@nx/vite": "24.0.0",
+    "@nx/vitest": "24.0.0",
+    "@nx/vue": "24.0.0",
+    "@nx/web": "24.0.0",
+    "@playwright/test": "^1.37.0",
     "@swc-node/register": "1.11.1",
     "@swc/core": "1.15.8",
     "@swc/helpers": "0.5.18",
     "@types/node": "^24.0.0",
+    "@vitejs/plugin-vue": "^6.0.1",
+    "@vitest/coverage-v8": "~5.0.1",
+    "@vue/test-utils": "^2.4.6",
+    "jiti": "2.4.2",
+    "jsdom": "^27.1.0",
     "nx": "24.0.0",
+    "oxlint": "^1.75.0",
     "prettier": "^3.8.1",
     "tslib": "^2.3.0",
-    "typescript": "~6.0.3"
+    "typescript": "~6.0.3",
+    "vite": "^8.0.0",
+    "vitest": "~5.0.1",
+    "vue-tsc": "^2.2.8"
   },
-  "packageManager": "pnpm@12.4.2"
+  "dependencies": {
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0"
+  }
 }
