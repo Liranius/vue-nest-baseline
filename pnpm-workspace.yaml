@@ -5,3 +5,4 @@ allowBuilds:
   '@swc/core@1.15.8': true
   nx@24.0.0: true
   esbuild: false
+  lefthook: false
