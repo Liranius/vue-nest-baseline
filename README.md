@@ -16,6 +16,20 @@ npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
 
 ## Run tasks
 
+### Formatting
+
+Oxfmt is the project's formatter. Use these Nx project targets locally and in CI:
+
+```sh
+pnpm exec nx run @baseline/source:format
+pnpm exec nx run @baseline/source:format-check
+```
+
+`format` rewrites files; `format-check` checks the whole workspace without writing.
+The configuration enables single quotes, import sorting, and Tailwind class sorting.
+Generated outputs and bundled third-party Nx skills are excluded from formatting;
+project code, configuration, and documentation remain checked.
+
 ### Lint
 
 Run all code and style checks through Nx:
@@ -32,7 +46,8 @@ which checks the root ESLint, Stylelint, and Vitest configuration files.
 These targets check without changing files. For targeted fixes, run
 `pnpm exec nx run @baseline/web:lint-eslint --fix` or
 `pnpm exec nx run @baseline/web:lint-style --fix`, then review the diff and rerun
-the full lint command. `eslint-config-prettier` disables conflicting format rules,
+the full lint command. `eslint-config-prettier` only disables conflicting ESLint
+format rules; it does not install or run a formatter. Oxfmt handles formatting,
 and `eslint-plugin-oxlint` disables ESLint rules already checked by Oxlint.
 
 To build the library use:
