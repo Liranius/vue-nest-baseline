@@ -5,7 +5,7 @@
 </template>
 
 <style>
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .about {
     max-width: 768px;
     margin-left: auto;

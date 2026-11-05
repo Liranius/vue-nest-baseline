@@ -16,6 +16,25 @@ npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
 
 ## Run tasks
 
+### Lint
+
+Run all code and style checks through Nx:
+
+```sh
+pnpm exec nx run-many -t lint
+```
+
+The `@baseline/web:lint` target runs Oxlint, type-aware ESLint (including Vue
+and Vitest rules), and Stylelint for CSS and Vue styles. `@baseline/web-e2e:lint`
+also runs ESLint with Playwright rules. Both include `@baseline/source:lint`,
+which checks the root ESLint, Stylelint, and Vitest configuration files.
+
+These targets check without changing files. For targeted fixes, run
+`pnpm exec nx run @baseline/web:lint-eslint --fix` or
+`pnpm exec nx run @baseline/web:lint-style --fix`, then review the diff and rerun
+the full lint command. `eslint-config-prettier` disables conflicting format rules,
+and `eslint-plugin-oxlint` disables ESLint rules already checked by Oxlint.
+
 To build the library use:
 
 ```sh
