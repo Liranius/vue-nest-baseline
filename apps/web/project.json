@@ -5,6 +5,30 @@
   "sourceRoot": "apps/web/src",
   "// targets": "to see all targets run: nx show project @baseline/web --web",
   "targets": {
+    "build": {
+      "executor": "nx:noop",
+      "dependsOn": ["build-only", "typecheck"]
+    },
+    "build-only": {
+      "dependsOn": ["^build"]
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck"],
+      "inputs": [
+        "default",
+        "^production",
+        "{workspaceRoot}/tsconfig.base.json",
+        "{workspaceRoot}/package.json",
+        "{workspaceRoot}/pnpm-lock.yaml"
+      ],
+      "outputs": ["{projectRoot}/out-tsc"]
+    },
+    "preview": {
+      "dependsOn": ["build"]
+    },
+    "serve-static": {
+      "dependsOn": ["build"]
+    },
     "lint": {
       "dependsOn": [
         "lint-eslint",

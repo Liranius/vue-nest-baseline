@@ -36,6 +36,23 @@ npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
 
 ## Run tasks
 
+### Build and type checking
+
+```sh
+pnpm exec nx run @baseline/web:build
+pnpm exec nx run @baseline/web:typecheck
+pnpm exec nx run @baseline/web:build-only
+```
+
+`build` requires both Vite bundling and Vue/TypeScript checking to succeed.
+`typecheck` checks the app, unit tests, and Vite config independently of bundling.
+Its cache includes test files, TypeScript configs, and dependency versions.
+Type declarations and incremental state are cached in `apps/web/out-tsc`, separate
+from the deployable bundle in `apps/web/dist`.
+
+`build-only` runs just Vite; pass bundler options such as `--mode` to this target.
+The `preview` and `serve-static` targets depend on the complete `build` check.
+
 ### Formatting
 
 Oxfmt is the project's formatter. Use these Nx project targets locally and in CI:

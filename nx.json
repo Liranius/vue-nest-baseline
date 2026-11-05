@@ -44,7 +44,7 @@
     {
       "plugin": "@nx/vite/plugin",
       "options": {
-        "buildTargetName": "build",
+        "buildTargetName": "build-only",
         "serveTargetName": "serve",
         "devTargetName": "dev",
         "previewTargetName": "preview",
