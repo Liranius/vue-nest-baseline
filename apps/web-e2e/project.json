@@ -6,6 +6,18 @@
   "implicitDependencies": ["@baseline/web"],
   "// targets": "to see all targets run: nx show project @baseline/web-e2e --web",
   "targets": {
+    "e2e": {
+      "cache": false,
+      "dependsOn": ["typecheck", "^build"],
+      "options": {
+        "command": "playwright test --project=chromium"
+      },
+      "configurations": {
+        "all": {
+          "command": "playwright test"
+        }
+      }
+    },
     "lint": {
       "dependsOn": ["lint-eslint", { "projects": ["@baseline/source"], "target": "lint" }]
     }
