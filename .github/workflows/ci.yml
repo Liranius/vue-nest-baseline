@@ -52,8 +52,23 @@ jobs:
       - name: Check formatting
         run: pnpm exec nx run @baseline/source:format-check
 
-      - name: Install browsers
-        run: pnpm exec playwright install --with-deps chromium firefox webkit
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
 
       - name: Run checks
-        run: pnpm exec nx run-many -t lint test build typecheck e2e
+        run: pnpm exec nx run-many -t lint test build typecheck
+
+      - name: Browser smoke test
+        id: e2e
+        run: pnpm exec nx run @baseline/web-e2e:e2e -- --global-timeout=300000
+
+      - name: Upload browser failure report
+        if: ${{ failure() && steps.e2e.outcome == 'failure' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: browser-failure-report
+          path: |
+            apps/web-e2e/test-output/playwright/report/
+            apps/web-e2e/test-output/playwright/output/
+          if-no-files-found: ignore
+          retention-days: 7

@@ -53,6 +53,35 @@ from the deployable bundle in `apps/web/dist`.
 `build-only` runs just Vite; pass bundler options such as `--mode` to this target.
 The `preview` and `serve-static` targets depend on the complete `build` check.
 
+### Browser tests
+
+Install Chromium once, then run the default smoke test:
+
+```sh
+pnpm exec playwright install chromium
+pnpm exec nx run @baseline/web-e2e:e2e
+```
+
+For all three browsers:
+
+```sh
+pnpm exec playwright install chromium firefox webkit
+pnpm exec nx run @baseline/web-e2e:e2e --configuration=all
+```
+
+Both commands build and type-check first, then start a fresh production preview
+at `http://127.0.0.1:4173`. Playwright stops the server when the run ends and fails
+if the port is already occupied. E2E results are not cached; build and type-check
+tasks retain their caches. Use the Nx entry points so their prerequisites run.
+The existing `BASE_URL` override changes the test destination while the local
+preview still starts; leave it unset to test this checkout's production bundle.
+
+Failed tests retain screenshots and traces under
+`apps/web-e2e/test-output/playwright/output/`. The HTML report is written to
+`apps/web-e2e/test-output/playwright/report/` without opening automatically.
+CI runs the Chromium smoke test and uploads these directories on failure,
+retaining them for seven days.
+
 ### Formatting
 
 Oxfmt is the project's formatter. Use these Nx project targets locally and in CI:
