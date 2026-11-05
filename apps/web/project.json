@@ -4,5 +4,22 @@
   "projectType": "application",
   "sourceRoot": "apps/web/src",
   "// targets": "to see all targets run: nx show project @baseline/web --web",
-  "targets": {}
+  "targets": {
+    "lint": {
+      "dependsOn": [
+        "lint-eslint",
+        "lint-style",
+        { "projects": ["@baseline/source"], "target": "lint" }
+      ]
+    },
+    "lint-style": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["{projectRoot}/src/**/*.{css,vue}", "lintGlobals"],
+      "options": {
+        "cwd": "apps/web",
+        "command": "stylelint \"src/**/*.{css,vue}\""
+      }
+    }
+  }
 }

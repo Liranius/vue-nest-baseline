@@ -1,4 +1,6 @@
 {
   "extends": ["../../.oxlintrc.json"],
-  "plugins": ["vue", "vitest"]
+  "env": {
+    "browser": true
+  }
 }

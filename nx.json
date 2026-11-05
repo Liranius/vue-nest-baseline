@@ -6,9 +6,19 @@
       "default",
       "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
       "!{projectRoot}/tsconfig.spec.json",
-      "!{projectRoot}/src/test-setup.[jt]s"
+      "!{projectRoot}/src/test-setup.[jt]s",
+      "!{projectRoot}/.eslintrc.json",
+      "!{projectRoot}/eslint.config.mjs"
     ],
-    "sharedGlobals": []
+    "sharedGlobals": [],
+    "lintGlobals": [
+      "{workspaceRoot}/eslint.config.mjs",
+      "{workspaceRoot}/stylelint.config.mjs",
+      "{workspaceRoot}/.oxlintrc.json",
+      "{workspaceRoot}/tsconfig.base.json",
+      "{workspaceRoot}/package.json",
+      "{workspaceRoot}/pnpm-lock.yaml"
+    ]
   },
   "plugins": [
     {
@@ -57,10 +67,19 @@
       "options": {
         "targetName": "e2e"
       }
+    },
+    {
+      "plugin": "@nx/eslint/plugin",
+      "options": {
+        "targetName": "lint-eslint"
+      }
     }
   ],
   "analytics": false,
   "targetDefaults": {
+    "lint-eslint": {
+      "inputs": ["default", "^default", "lintGlobals"]
+    },
     "test": {
       "dependsOn": ["^build"]
     }
