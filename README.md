@@ -50,6 +50,34 @@ the full lint command. `eslint-config-prettier` only disables conflicting ESLint
 format rules; it does not install or run a formatter. Oxfmt handles formatting,
 and `eslint-plugin-oxlint` disables ESLint rules already checked by Oxlint.
 
+### Git hooks and commit messages
+
+After installing dependencies, install the hooks once in each checkout:
+
+```sh
+pnpm exec nx run @baseline/source:hooks-install
+```
+
+Lefthook's `pre-commit` hook runs Oxlint, ESLint, Stylelint, then Oxfmt on
+applicable staged files. It fixes files and stages the fixes automatically.
+Generated outputs and bundled third-party skills are excluded. The hook targets
+disable Nx caching because they depend on the current Git index and modify files.
+CI still checks the whole workspace without applying fixes.
+
+The `commit-msg` hook uses Commitlint's Conventional Commits preset, with no
+default message exemptions. For example, use `feat(web): add settings page`
+or `fix(web): handle missing user`. PR CI checks every non-merge commit between
+the PR's base and head; checking only the latest commit or PR title is insufficient.
+
+To check a message file manually:
+
+```sh
+pnpm exec nx run @baseline/source:commitlint -- --edit path/to/message.txt
+```
+
+Lefthook's dependency install script is disabled in `pnpm-workspace.yaml`;
+hook installation is explicit through the Nx target above.
+
 To build the library use:
 
 ```sh

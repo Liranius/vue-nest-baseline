@@ -1,0 +1,33 @@
+$schema: ./node_modules/lefthook/schema.json
+glob_matcher: doublestar
+
+pre-commit:
+  piped: true
+  exclude:
+    - '**/{dist,out-tsc,coverage,test-output,playwright-report,test-results}/**'
+    - '.nx/**'
+    - '.agents/skills/**'
+    - '.cursor/skills/**'
+    - '.github/skills/**'
+    - '.opencode/skills/**'
+  jobs:
+    - name: oxlint
+      glob: '**/*.{js,mjs,cjs,jsx,ts,mts,cts,tsx,vue}'
+      run: pnpm exec nx run @baseline/source:lint-staged-oxlint --output-style=static -- {staged_files}
+      stage_fixed: true
+    - name: eslint
+      glob: '**/*.{js,mjs,cjs,jsx,ts,mts,cts,tsx,vue}'
+      run: pnpm exec nx run @baseline/source:lint-staged-eslint --output-style=static -- {staged_files}
+      stage_fixed: true
+    - name: stylelint
+      glob: '**/*.{css,vue}'
+      run: pnpm exec nx run @baseline/source:lint-staged-style --output-style=static -- {staged_files}
+      stage_fixed: true
+    - name: format
+      run: pnpm exec nx run @baseline/source:format --output-style=static -- --no-error-on-unmatched-pattern {staged_files}
+      stage_fixed: true
+
+commit-msg:
+  jobs:
+    - name: commitlint
+      run: pnpm exec nx run @baseline/source:commitlint --output-style=static -- --edit '{1}'
