@@ -8,6 +8,26 @@
 
 🚀 If you haven't connected to Nx Cloud yet, [complete your setup here](https://cloud.nx.app/get-started). Get faster builds with remote caching, distributed task execution, and self-healing CI. [See how your workspace can benefit](#nx-cloud).
 
+## Development environment
+
+Use Node.js 24.21.0 from `.node-version` and pnpm 12.4.2 from `packageManager`.
+The supported Node range is `>=24.21.0 <25`; CI reads `.node-version` directly.
+For example, with fnm installed, run `fnm install` followed by `fnm use` in this
+directory before installing dependencies:
+
+```sh
+pnpm install --frozen-lockfile
+pnpm exec nx run @baseline/source:hooks-install
+```
+
+`pnpm-workspace.yaml` enforces dependency engine and peer dependency compatibility.
+`package.json` uses `devEngines.runtime` with `onFail: error` to enforce the
+`engines.node` range when running pnpm commands. Keep both ranges in sync when
+updating Node, and switch to `.node-version` before running tasks. Direct
+dependencies use exact versions, and `saveExact` keeps future additions exact.
+Update dependency versions deliberately and commit `package.json` together with
+`pnpm-lock.yaml`. The existing dependency build-script allowlist remains in effect.
+
 ## Generate a library
 
 ```sh

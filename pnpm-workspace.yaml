@@ -1,6 +1,9 @@
 packages:
   - 'packages/*'
   - 'apps/web'
+engineStrict: true
+strictPeerDependencies: true
+saveExact: true
 allowBuilds:
   '@swc/core@1.15.8': true
   nx@24.0.0: true
