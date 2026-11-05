@@ -1,7 +1,7 @@
+import { nxReadySignal } from '@nx/vite/plugins/nx-ready-signal.plugin';
+import vue from '@vitejs/plugin-vue';
 /// <reference types='vitest' />
 import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
-import { nxReadySignal } from '@nx/vite/plugins/nx-ready-signal.plugin';
 
 export default defineConfig(() => ({
   root: import.meta.dirname,

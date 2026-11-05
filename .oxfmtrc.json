@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "singleQuote": true,
+  "sortImports": true,
+  "sortTailwindcss": true,
+  "ignorePatterns": [
+    "**/dist/**",
+    "**/out-tsc/**",
+    "**/coverage/**",
+    "**/test-output/**",
+    ".nx/**",
+    ".agents/skills/**",
+    ".cursor/skills/**",
+    ".github/skills/**",
+    ".opencode/skills/**"
+  ]
+}
