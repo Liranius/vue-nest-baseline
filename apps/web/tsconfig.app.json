@@ -3,6 +3,9 @@
   "compilerOptions": {
     "noEmit": false,
     "noUncheckedIndexedAccess": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "outDir": "out-tsc/app",
     "types": ["vite/client"],
     "rootDir": "src",
