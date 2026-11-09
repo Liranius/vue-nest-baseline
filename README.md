@@ -79,6 +79,14 @@ TypeScript paths; unit tests inherit both through the Vite config and
 `tsconfig.spec.json`. Keep these mappings in sync. This alias is local to the Web
 app; imports from other workspace packages use their package names.
 
+### Vue DevTools
+
+Run `pnpm exec nx run @baseline/web:dev` to start the development server with
+Vue DevTools. Open the app and press `Alt+Shift+D` to toggle the panel, or use
+the `/__devtools__/` URL printed by Vite to open it in a separate window.
+The plugin provides component inspection and Vue Router/Pinia debugging.
+Its development overlay is not included in production builds.
+
 ### State management
 
 The Web entry point registers a fresh Pinia instance before Vue Router.
