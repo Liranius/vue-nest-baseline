@@ -102,6 +102,19 @@ extends the app's default inputs, covering builds and all inferred unit-test
 targets. It hashes ignored `env/.env*` files as well as `VITE_APP_TITLE` and
 `NODE_ENV`, so local overrides and shell values cannot reuse stale cached results.
 
+### Unit tests
+
+```sh
+pnpm exec nx run @baseline/web:test
+pnpm exec nx run @baseline/web:test-watch
+```
+
+`test` runs once and can use Nx caching. `test-watch` runs continuously, reruns
+affected tests after file changes, and disables Nx caching. Both use the same
+Vitest configuration and build workspace dependencies first. Stop the watcher
+with Ctrl+C; test failures keep it running so fixing the file can trigger a rerun.
+CI uses the single-run `test` target.
+
 ### Browser tests
 
 Install Chromium once, then run the default smoke test:
@@ -158,10 +171,23 @@ and Vitest rules), and Stylelint for CSS and Vue styles. `@baseline/web-e2e:lint
 also runs ESLint with Playwright rules. Both include `@baseline/source:lint`,
 which checks the root ESLint, Stylelint, and Vitest configuration files.
 
-These targets check without changing files. For targeted fixes, run
-`pnpm exec nx run @baseline/web:lint-eslint --fix` or
-`pnpm exec nx run @baseline/web:lint-style --fix`, then review the diff and rerun
-the full lint command. `eslint-config-prettier` only disables conflicting ESLint
+The `lint` targets check without changing files and are used by CI. To apply
+available fixes across all projects or just the Web app:
+
+```sh
+pnpm exec nx run-many -t lint-fix
+pnpm exec nx run @baseline/web:lint-fix
+```
+
+Each `lint-fix` target disables Nx caching and runs its applicable checkers in
+order: Oxlint, ESLint, then Stylelint for Web styles. Web and E2E run the root
+configuration fixes first. Remaining errors fail the command; fixes already
+applied are kept in the working tree. Review the diff, then rerun `lint`.
+Both Web style-checking commands explicitly select the root Stylelint config,
+including when `NODE_ENV=test` limits automatic config discovery.
+Formatting is handled separately by the `format` target.
+
+`eslint-config-prettier` only disables conflicting ESLint
 format rules; it does not install or run a formatter. Oxfmt handles formatting,
 and `eslint-plugin-oxlint` disables ESLint rules already checked by Oxlint.
 

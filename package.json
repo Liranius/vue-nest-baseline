@@ -146,6 +146,18 @@
           "command": "oxfmt --check"
         }
       },
+      "lint-fix": {
+        "executor": "nx:run-commands",
+        "cache": false,
+        "options": {
+          "commands": [
+            "oxlint eslint.config.mjs stylelint.config.mjs commitlint.config.mjs vitest.config.mts --fix",
+            "eslint eslint.config.mjs stylelint.config.mjs commitlint.config.mjs vitest.config.mts --fix"
+          ],
+          "parallel": false,
+          "forwardAllArgs": false
+        }
+      },
       "lint": {
         "executor": "nx:run-commands",
         "cache": true,
