@@ -2,6 +2,7 @@ import { fileURLToPath } from 'node:url';
 
 import { nxReadySignal } from '@nx/vite/plugins/nx-ready-signal.plugin';
 import vue from '@vitejs/plugin-vue';
+import vueDevTools from 'vite-plugin-vue-devtools';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig(() => ({
@@ -17,7 +18,7 @@ export default defineConfig(() => ({
     port: 4300,
     host: 'localhost',
   },
-  plugins: [vue(), nxReadySignal()],
+  plugins: [vue(), vueDevTools(), nxReadySignal()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
