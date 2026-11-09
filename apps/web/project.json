@@ -4,6 +4,14 @@
   "projectType": "application",
   "sourceRoot": "apps/web/src",
   "// targets": "to see all targets run: nx show project @baseline/web --web",
+  "namedInputs": {
+    "default": ["{projectRoot}/**/*", "sharedGlobals", "webEnvironment"],
+    "webEnvironment": [
+      { "fileset": "{projectRoot}/env/.env*", "includeIgnored": true },
+      { "env": "VITE_APP_TITLE" },
+      { "env": "NODE_ENV" }
+    ]
+  },
   "targets": {
     "build": {
       "executor": "nx:noop",

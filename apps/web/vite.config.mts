@@ -4,6 +4,8 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig(() => ({
   root: import.meta.dirname,
+  // Let Vite load mode files without Nx preloading the defaults into process.env.
+  envDir: './env',
   cacheDir: '../../node_modules/.vite/apps/web',
   server: {
     port: 4200,
