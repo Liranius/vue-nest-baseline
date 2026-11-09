@@ -73,6 +73,12 @@ with strict peer dependency checks enabled.
 `build-only` runs just Vite; pass bundler options such as `--mode` to this target.
 The `preview` and `serve-static` targets depend on the complete `build` check.
 
+Within the Web app, `@/` resolves to `apps/web/src/`, for example `@/router`.
+Vite defines the runtime alias and `tsconfig.app.json` defines the matching
+TypeScript paths; unit tests inherit both through the Vite config and
+`tsconfig.spec.json`. Keep these mappings in sync. This alias is local to the Web
+app; imports from other workspace packages use their package names.
+
 ### Web environment variables
 
 `apps/web/env/.env` provides public defaults, including `VITE_APP_TITLE` for the
