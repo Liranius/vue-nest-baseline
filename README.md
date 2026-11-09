@@ -66,6 +66,29 @@ with strict peer dependency checks enabled.
 `build-only` runs just Vite; pass bundler options such as `--mode` to this target.
 The `preview` and `serve-static` targets depend on the complete `build` check.
 
+### Web environment variables
+
+`apps/web/env/.env` provides public defaults, including `VITE_APP_TITLE` for the
+browser tab title. No local configuration is required to start or build the app.
+For personal overrides, copy `apps/web/env/.env.example` to
+`apps/web/env/.env.local`. Local and mode-specific override files are Git-ignored;
+the defaults and example are committed. All `VITE_*` values are exposed to the
+client, so use them only for public configuration.
+
+Vite's `envDir` points to this directory so Nx does not preload the same files
+into `process.env` and change Vite's precedence. From highest to lowest priority:
+existing process variables, `.env.[mode].local`, `.env.[mode]`, `.env.local`, `.env`.
+Development uses `development`; builds use `production` unless `--mode` is passed
+to `build-only`. Restart the dev server after changing environment files; preview
+serves the values from the last build.
+
+`apps/web/src/env.d.ts` enables strict `import.meta.env` names. When adding a public
+variable, declare it there, provide its default and example, and add its process
+environment input to `webEnvironment` in `apps/web/project.json`. That named input
+extends the app's default inputs, covering builds and all inferred unit-test
+targets. It hashes ignored `env/.env*` files as well as `VITE_APP_TITLE` and
+`NODE_ENV`, so local overrides and shell values cannot reuse stale cached results.
+
 ### Browser tests
 
 Install Chromium once, then run the default smoke test:
