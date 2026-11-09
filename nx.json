@@ -15,7 +15,7 @@
       "{workspaceRoot}/eslint.config.mjs",
       "{workspaceRoot}/stylelint.config.mjs",
       "{workspaceRoot}/.oxlintrc.json",
-      "{workspaceRoot}/tsconfig.base.json",
+      "{workspaceRoot}/tsconfig*.json",
       "{workspaceRoot}/package.json",
       "{workspaceRoot}/pnpm-lock.yaml"
     ]

@@ -25,12 +25,14 @@
     "@swc-node/register": "1.11.1",
     "@swc/core": "1.15.8",
     "@swc/helpers": "0.5.18",
+    "@tsconfig/node24": "24.0.5",
     "@types/node": "24.19.2",
     "@vitejs/plugin-vue": "6.0.10",
     "@vitest/coverage-v8": "5.0.5",
     "@vitest/eslint-plugin": "1.6.27",
     "@vue/eslint-config-typescript": "14.9.0",
     "@vue/test-utils": "2.5.1",
+    "@vue/tsconfig": "0.9.1",
     "eslint": "10.14.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-oxlint": "1.90.0",
@@ -68,6 +70,25 @@
   "packageManager": "pnpm@12.4.2",
   "nx": {
     "targets": {
+      "typecheck": {
+        "executor": "nx:run-commands",
+        "cache": true,
+        "dependsOn": [],
+        "inputs": [
+          "{workspaceRoot}/*.config.{ts,mts,cts}",
+          "{workspaceRoot}/config/**/*.{ts,mts,cts}",
+          "{workspaceRoot}/tsconfig.base.json",
+          "{workspaceRoot}/tsconfig.node.json",
+          "{workspaceRoot}/package.json",
+          "{workspaceRoot}/pnpm-lock.yaml"
+        ],
+        "outputs": [
+          "{workspaceRoot}/out-tsc/node"
+        ],
+        "options": {
+          "command": "tsc --build tsconfig.node.json --emitDeclarationOnly"
+        }
+      },
       "hooks-install": {
         "executor": "nx:run-commands",
         "cache": false,

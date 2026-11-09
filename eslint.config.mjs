@@ -11,9 +11,9 @@ import { globalIgnores } from 'eslint/config';
 import globals from 'globals';
 
 const unitTests = [
-  'apps/web/src/**/*.{test,spec}.{js,ts,jsx,tsx}',
-  'apps/web/src/**/__tests__/**/*.{js,ts,jsx,tsx}',
-  'apps/web/tests/**/*.{js,ts,jsx,tsx}',
+  'apps/web/src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+  'apps/web/src/**/__tests__/**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+  'apps/web/tests/**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
 ];
 
 export default withVueTs(
@@ -51,8 +51,7 @@ export default withVueTs(
     languageOptions: {
       parserOptions: {
         tsconfigRootDir: import.meta.dirname,
-        // The root Vitest workspace config is outside the app TS projects.
-        projectService: { allowDefaultProject: ['vitest.config.mts'] },
+        projectService: true,
       },
     },
   },

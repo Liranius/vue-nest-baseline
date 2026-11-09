@@ -45,10 +45,23 @@ pnpm exec nx run @baseline/web:build-only
 ```
 
 `build` requires both Vite bundling and Vue/TypeScript checking to succeed.
-`typecheck` checks the app, unit tests, and Vite config independently of bundling.
+`typecheck` checks the app, unit tests, Vite config, and root Vitest config
+independently of bundling.
 Its cache includes test files, TypeScript configs, and dependency versions.
 Type declarations and incremental state are cached in `apps/web/out-tsc`, separate
 from the deployable bundle in `apps/web/dist`.
+
+Browser code uses `@vue/tsconfig` with `noUncheckedIndexedAccess`. Unit-test types
+extend the browser configuration and cover `src/**/*.{test,spec}.*`,
+`src/**/__tests__/`, and `tests/`. Node tool configs and browser-test runners use
+`@tsconfig/node24` with explicit Node types. The root Vitest config has its own
+`@baseline/source:typecheck` target and stores outputs in `out-tsc/node`;
+the Web type-check target includes it as a prerequisite. Declaration output stays
+enabled for Nx project references.
+
+TODO: Revisit the `vue-tsc` 3.x upgrade when the Nx Vue plugin supports it.
+`@nx/vue@24.0.0` declares `vue-tsc ^2.0.0`, so this workspace keeps `2.2.12`
+with strict peer dependency checks enabled.
 
 `build-only` runs just Vite; pass bundler options such as `--mode` to this target.
 The `preview` and `serve-static` targets depend on the complete `build` check.
