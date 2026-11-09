@@ -1,19 +1,15 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": ["../../tsconfig.base.json", "@tsconfig/node24/tsconfig.json"],
   "compilerOptions": {
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
     "allowJs": true,
+    "rootDir": ".",
     "outDir": "out-tsc/playwright",
+    "tsBuildInfoFile": "out-tsc/playwright/tsconfig.tsbuildinfo",
     "sourceMap": false
   },
-  "include": [
-    "**/*.ts",
-    "**/*.js",
-    "playwright.config.mts",
-    "src/**/*.spec.ts",
-    "src/**/*.spec.js",
-    "src/**/*.test.ts",
-    "src/**/*.test.js",
-    "src/**/*.d.ts"
-  ],
+  "include": ["**/*"],
   "exclude": ["out-tsc", "test-output"]
 }

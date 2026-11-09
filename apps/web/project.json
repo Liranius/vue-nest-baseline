@@ -13,7 +13,7 @@
       "dependsOn": ["^build"]
     },
     "typecheck": {
-      "dependsOn": ["^typecheck"],
+      "dependsOn": ["^typecheck", { "projects": ["@baseline/source"], "target": "typecheck" }],
       "inputs": [
         "default",
         "^production",

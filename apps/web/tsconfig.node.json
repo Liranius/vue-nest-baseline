@@ -1,0 +1,19 @@
+{
+  "extends": ["../../tsconfig.base.json", "@tsconfig/node24/tsconfig.json"],
+  "compilerOptions": {
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "rootDir": ".",
+    "outDir": "out-tsc/node",
+    "tsBuildInfoFile": "out-tsc/node/tsconfig.node.tsbuildinfo"
+  },
+  "include": [
+    "*.config.ts",
+    "*.config.mts",
+    "*.config.cts",
+    "config/**/*.ts",
+    "config/**/*.mts",
+    "config/**/*.cts"
+  ]
+}
