@@ -196,6 +196,30 @@ These targets are either [inferred automatically](https://nx.dev/docs/concepts/i
 
 [More about running tasks in the docs &raquo;](https://nx.dev/docs/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
 
+## Continuous integration
+
+GitHub Actions runs on pull requests, pushes to `main`, and manual dispatches.
+For the same workflow, event, and ref, a new run cancels the previous run.
+The `Checks` job has a 15-minute timeout and runs the existing Nx formatting,
+lint, unit-test, build, type-check, and Chromium smoke-test targets after a frozen
+dependency install. Pull requests also validate all non-merge commit messages
+between the event's base and head SHAs. Browser failures retain the report and
+traces for seven days.
+
+The final verifier requires every mandatory step's original `outcome` to be
+`success`, including commit validation on pull requests. The separate summary job
+requires both a successful `Checks` job and its explicit `verified=true` output;
+failed, skipped, missing, or cancelled checks cannot satisfy this gate. Its timeout
+is two minutes, and a cancelled workflow is explicitly rejected.
+
+The summary is named `Quality` on pull requests and `CI result` on other events.
+When configuring GitHub branch rules, select `Quality` as the required check;
+these workflow files do not configure branch rules themselves.
+
+Actions use full commit SHA pins with version comments. Checkout fetches full
+history without persisting credentials. Dependabot checks GitHub Actions updates
+weekly; dependency updates still require review and CI.
+
 ## Versioning and releasing
 
 To version and release the library use
