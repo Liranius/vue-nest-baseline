@@ -28,6 +28,13 @@ dependencies use exact versions, and `saveExact` keeps future additions exact.
 Update dependency versions deliberately and commit `package.json` together with
 `pnpm-lock.yaml`. The existing dependency build-script allowlist remains in effect.
 
+Editor recommendations are listed in `.vscode/extensions.json`, including Vue,
+Vitest, Playwright, ESLint, Oxc, EditorConfig, and Nx Console. `.editorconfig`
+defines UTF-8, two-space indentation, LF line endings, a final newline, and a
+100-character line width; Markdown keeps trailing spaces. Git's `.gitattributes`
+normalizes text to LF and checks out `.cmd` and `.bat` scripts with CRLF.
+Oxfmt remains the formatter used by the workspace targets and Git hooks.
+
 ## Generate a library
 
 ```sh
