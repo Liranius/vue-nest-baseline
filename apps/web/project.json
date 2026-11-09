@@ -31,6 +31,16 @@
       ],
       "outputs": ["{projectRoot}/out-tsc"]
     },
+    "test-watch": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "continuous": true,
+      "dependsOn": ["^build"],
+      "options": {
+        "cwd": "apps/web",
+        "command": "vitest --watch"
+      }
+    },
     "preview": {
       "dependsOn": ["build"]
     },
@@ -44,13 +54,28 @@
         { "projects": ["@baseline/source"], "target": "lint" }
       ]
     },
+    "lint-fix": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "dependsOn": [{ "projects": ["@baseline/source"], "target": "lint-fix" }],
+      "options": {
+        "cwd": "apps/web",
+        "commands": [
+          "oxlint . --fix",
+          "eslint . --fix",
+          "stylelint \"src/**/*.{css,vue}\" --config ../../stylelint.config.mjs --fix"
+        ],
+        "parallel": false,
+        "forwardAllArgs": false
+      }
+    },
     "lint-style": {
       "executor": "nx:run-commands",
       "cache": true,
       "inputs": ["{projectRoot}/src/**/*.{css,vue}", "lintGlobals"],
       "options": {
         "cwd": "apps/web",
-        "command": "stylelint \"src/**/*.{css,vue}\""
+        "command": "stylelint \"src/**/*.{css,vue}\" --config ../../stylelint.config.mjs"
       }
     }
   }

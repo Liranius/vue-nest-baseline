@@ -18,6 +18,17 @@
         }
       }
     },
+    "lint-fix": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "dependsOn": [{ "projects": ["@baseline/source"], "target": "lint-fix" }],
+      "options": {
+        "cwd": "apps/web-e2e",
+        "commands": ["oxlint . --fix", "eslint . --fix"],
+        "parallel": false,
+        "forwardAllArgs": false
+      }
+    },
     "lint": {
       "dependsOn": ["lint-eslint", { "projects": ["@baseline/source"], "target": "lint" }]
     }
