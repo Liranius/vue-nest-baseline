@@ -79,6 +79,19 @@ TypeScript paths; unit tests inherit both through the Vite config and
 `tsconfig.spec.json`. Keep these mappings in sync. This alias is local to the Web
 app; imports from other workspace packages use their package names.
 
+### State management
+
+The Web entry point registers a fresh Pinia instance before Vue Router.
+`apps/web/src/stores/counter.ts` provides the baseline setup-store example with
+`count`, the derived `doubleCount`, and an `increment` action. Import it with
+`@/stores/counter` and call `useCounterStore()` from component setup; outside
+components, use it after Pinia is installed or pass the instance explicitly.
+
+Dependencies include `pinia` and its required `@vue/devtools-api` peer at exact
+versions. Component tests create their own Pinia instance. The store integration
+test checks reactive updates shared by sibling components and state isolation
+between separate instances.
+
 ### Web environment variables
 
 `apps/web/env/.env` provides public defaults, including `VITE_APP_TITLE` for the
