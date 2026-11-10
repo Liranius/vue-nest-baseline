@@ -104,14 +104,27 @@ function bind(cwd) {
   ) {
     throw new Error(`Knowledge project points outside its assigned worktree: ${configPath}`);
   }
+  if (
+    (config.database_backend !== undefined && config.database_backend !== 'sqlite') ||
+    (config.database_url !== undefined && config.database_url !== null)
+  ) {
+    throw new Error(`Knowledge database must use worktree-local SQLite: ${configPath}`);
+  }
   return ctx;
 }
 
 function environment(ctx) {
+  // Basic Memory settings are case-insensitive and take precedence over config.json.
+  // Only this launcher may supply them; keep unrelated OS/tool environment settings.
+  const inherited = Object.fromEntries(
+    Object.entries(process.env).filter(([name]) => !name.toUpperCase().startsWith('BASIC_MEMORY_')),
+  );
   return {
-    ...process.env,
+    ...inherited,
     BASIC_MEMORY_CONFIG_DIR: ctx.settings,
     BASIC_MEMORY_FORCE_LOCAL: 'true',
+    BASIC_MEMORY_DATABASE_BACKEND: 'sqlite',
+    BASIC_MEMORY_CLOUD_MODE: 'false',
     BASIC_MEMORY_NO_PROMOS: '1',
     BASIC_MEMORY_AUTO_UPDATE: 'false',
     BASIC_MEMORY_SEMANTIC_EMBEDDING_CACHE_DIR: join(ctx.cache, 'models'),
@@ -143,8 +156,11 @@ function installedVersion(ctx) {
     ctx.python,
     ['-c', 'from importlib.metadata import version; print(version("basic-memory"))'],
     {
+      cwd: ctx.root,
+      env: environment(ctx),
       encoding: 'utf8',
       windowsHide: true,
+      timeout: 10000,
     },
   );
   return result.status === 0 ? result.stdout.trim() : null;
@@ -168,7 +184,7 @@ function findUv(ctx) {
   );
 }
 
-async function relay(ctx, args, input) {
+export async function relay(ctx, args, input, { timeoutMs } = {}) {
   const child = spawn(ctx.executable, args, {
     cwd: ctx.root,
     env: environment(ctx),
@@ -178,6 +194,14 @@ async function relay(ctx, args, input) {
   const stop = () => child.kill();
   process.once('SIGINT', stop);
   process.once('SIGTERM', stop);
+  let timedOut = false;
+  const timer =
+    timeoutMs === undefined
+      ? undefined
+      : setTimeout(() => {
+          timedOut = true;
+          child.kill('SIGKILL');
+        }, timeoutMs);
   if (input !== undefined) {
     child.stdin.on('error', () => {});
     child.stdin.end(input);
@@ -185,17 +209,44 @@ async function relay(ctx, args, input) {
   try {
     await new Promise((resolvePromise, reject) => {
       child.once('error', reject);
-      child.once('close', (code) =>
-        code === 0 ? resolvePromise() : reject(new Error(`Basic Memory exited ${code}.`)),
-      );
+      child.once('close', (code) => {
+        if (timedOut) reject(new Error(`Basic Memory ${args[0]} timed out after ${timeoutMs}ms.`));
+        else if (code === 0) resolvePromise();
+        else reject(new Error(`Basic Memory exited ${code}.`));
+      });
     });
   } finally {
+    clearTimeout(timer);
     process.removeListener('SIGINT', stop);
     process.removeListener('SIGTERM', stop);
   }
 }
 
-async function checkMcp(ctx) {
+function checkProjectBinding(ctx, result) {
+  const structured = result.structuredContent?.result;
+  const data = structured ?? JSON.parse(result.content?.find((item) => item.type === 'text')?.text);
+  const projects = data?.projects;
+  const project = projects?.[0];
+  if (
+    !Array.isArray(projects) ||
+    projects.length !== 1 ||
+    project?.name !== ctx.project ||
+    project.source !== 'local' ||
+    project.is_default !== true ||
+    data.default_project !== ctx.project ||
+    (data.constrained_project != null && data.constrained_project !== ctx.project) ||
+    ![project.path, project.local_path].every(
+      (path) =>
+        typeof path === 'string' &&
+        isAbsolute(path) &&
+        canonical(realpathSync(path)) === canonical(realpathSync(ctx.notes)),
+    )
+  ) {
+    throw new Error('MCP project binding does not match this worktree.');
+  }
+}
+
+export async function checkMcp(ctx, { timeoutMs = 90000, shutdownTimeoutMs = 5000 } = {}) {
   const child = spawn(ctx.executable, ['mcp'], {
     cwd: ctx.root,
     env: environment(ctx),
@@ -205,42 +256,63 @@ async function checkMcp(ctx) {
   let sequence = 0;
   let buffer = '';
   let stderr = '';
+  let failure;
+  let succeeded = false;
   const pending = new Map();
+  function fail(error) {
+    failure ??= error;
+    for (const request of pending.values()) {
+      clearTimeout(request.timer);
+      request.reject(failure);
+    }
+    pending.clear();
+  }
+  const closed = new Promise((resolvePromise) => {
+    child.once('error', fail);
+    child.once('close', (code, signal) => {
+      fail(new Error(`MCP exited ${signal ?? code}. ${stderr}`));
+      resolvePromise();
+    });
+  });
+  child.stdout.setEncoding('utf8');
+  child.stderr.setEncoding('utf8');
   child.stderr.on('data', (chunk) => {
     stderr = (stderr + chunk).slice(-4000);
   });
-  child.stdin.on('error', () => {});
+  child.stdin.on('error', fail);
   child.stdout.on('data', (chunk) => {
     buffer += chunk;
     let end;
     while ((end = buffer.indexOf('\n')) >= 0) {
       const line = buffer.slice(0, end);
       buffer = buffer.slice(end + 1);
+      let message;
       try {
-        const message = JSON.parse(line);
-        pending.get(message.id)?.(message);
+        message = JSON.parse(line);
       } catch {
         /* Ignore non-protocol logging; initialization still must succeed. */
+        continue;
       }
+      const request = pending.get(message?.id);
+      if (!request) continue;
+      pending.delete(message.id);
+      clearTimeout(request.timer);
+      if (message.error || message.result?.isError) {
+        request.reject(new Error(JSON.stringify(message)));
+      } else request.resolve(message.result);
     }
   });
   function call(method, params) {
+    if (failure) return Promise.reject(failure);
     const id = ++sequence;
     return new Promise((resolvePromise, reject) => {
       const timer = setTimeout(() => {
-        pending.delete(id);
-        reject(new Error(`MCP ${method} timed out. ${stderr}`));
-      }, 90000);
-      pending.set(id, (message) => {
-        pending.delete(id);
-        clearTimeout(timer);
-        if (message.error || message.result?.isError) reject(new Error(JSON.stringify(message)));
-        else resolvePromise(message.result);
-      });
+        fail(new Error(`MCP ${method} timed out. ${stderr}`));
+      }, timeoutMs);
+      pending.set(id, { resolve: resolvePromise, reject, timer });
       child.stdin.write(`${JSON.stringify({ jsonrpc: '2.0', id, method, params })}\n`);
     });
   }
-  const closed = new Promise((resolvePromise) => child.once('close', resolvePromise));
   try {
     await call('initialize', {
       protocolVersion: '2024-11-05',
@@ -255,12 +327,13 @@ async function checkMcp(ctx) {
       name: 'list_memory_projects',
       arguments: { output_format: 'json' },
     });
-    if (!JSON.stringify(projects).includes(ctx.project))
-      throw new Error('MCP did not expose the assigned project.');
+    checkProjectBinding(ctx, projects);
+    succeeded = true;
     return inventory.tools.length;
   } finally {
     child.stdin.end();
-    const timer = setTimeout(() => child.kill(), 5000);
+    if (!succeeded) child.kill();
+    const timer = setTimeout(() => child.kill('SIGKILL'), shutdownTimeoutMs);
     await closed;
     clearTimeout(timer);
   }
@@ -304,12 +377,16 @@ export async function main(args = process.argv.slice(2)) {
   const [command, ...rest] = args;
   if (command === 'hook') {
     if (!['session-start', 'pre-compact'].includes(rest[0])) throw new Error('Unsupported hook.');
+    // Include input/version checks and leave 5s before the host's 30s/60s hook timeout.
+    const deadline = Date.now() + (rest[0] === 'session-start' ? 25000 : 55000);
     let input = '';
     for await (const chunk of process.stdin) input += chunk;
     const payload = JSON.parse(input);
     const ctx = bind(payload.cwd ?? process.cwd());
     requireRuntime(ctx);
-    await relay(ctx, ['hook', rest[0], '--harness', 'codex'], input);
+    const timeoutMs = deadline - Date.now();
+    if (timeoutMs <= 0) throw new Error('Basic Memory hook timed out before runtime startup.');
+    await relay(ctx, ['hook', rest[0], '--harness', 'codex'], input, { timeoutMs });
     return;
   }
   const ctx = bind(process.cwd());

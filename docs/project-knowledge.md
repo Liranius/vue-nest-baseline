@@ -17,7 +17,7 @@ pnpm exec nx run @baseline/source:knowledge-doctor
 
 `setup` 使用 uv 安装隔离的 Python 3.12 和 Basic Memory 0.24.1，建立当前项目索引，并检查 MCP 和 SessionStart。首次运行需要联网下载运行时、依赖及本地向量模型；之后正常启动不执行安装或自动升级，不需要 Basic Memory 云账号。
 
-`doctor` 检查目录绑定、运行时版本、真实 MCP 握手与项目列表，以及官方 SessionStart 上下文。它不写业务知识，会创建本地诊断用生命周期事件。它验证的是组件；Codex 是否信任并实际加载项目 hooks，还需在新会话中确认。
+`doctor` 检查目录绑定、运行时版本、真实 MCP 握手，以及运行时返回的唯一项目、默认项目、本地来源和实际知识路径，再检查官方 SessionStart 上下文。MCP 启动失败或提前退出会立即失败，请求超时后终止并回收子进程；hooks 也有执行时限。它不写业务知识，会创建本地诊断用生命周期事件。它验证的是组件；Codex 是否信任并实际加载项目 hooks，还需在新会话中确认。
 
 在 Codex 中打开或重新开始本仓库的会话，信任项目配置，并在 CLI 的 `/hooks` 中审查和信任仓库的 SessionStart、PreCompact 命令。核对 `basic-memory` MCP 可用且收到 Basic Memory 启动上下文。新配置的实际加载以新会话验收为准，不能用本地 doctor 成功代替。子目录启动也受支持。项目级配置与 hooks 信任机制见官方 [MCP](https://learn.chatgpt.com/docs/extend/mcp) 和 [Hooks](https://learn.chatgpt.com/docs/hooks) 文档。
 
@@ -33,7 +33,9 @@ pnpm exec nx run @baseline/source:knowledge-doctor
 
 可用 `VUE_NEST_BASELINE_MEMORY_CACHE` 指定缓存根目录；MCP、hooks 和安装命令必须使用相同值。缓存路径应保持较短，避免 Windows 模型下载路径过长。
 
-运行时不信任外部传入的 `BASIC_MEMORY_CONFIG_DIR`，而是根据当前 worktree 重新确定它。复制来的配置若指向其他目录，或知识目录通过链接逃逸到 worktree 外，会报错并停止；不会自动改写未知配置。先按报错路径检查对应缓存，确认属于当前 worktree 后重建该单个缓存，不要复制数据库给其他 worktree。
+启动器按变量名不区分大小写清除继承的全部 `BASIC_MEMORY_*`，再设置当前 worktree 的配置目录、本地 SQLite 模式及项目固定值；其他环境变量仍正常继承。这样外部项目映射、默认项目、数据库 URL 或云模式不会覆盖已经验证的配置；外部同前缀的日志等偏好也不会透传，缓存根目录仍使用上述 `VUE_NEST_BASELINE_MEMORY_CACHE`。
+
+复制来的配置若指向其他目录、改用其他数据库后端或指定数据库 URL，或知识目录通过链接逃逸到 worktree 外，会报错并停止；不会自动改写未知配置。先按报错路径检查对应缓存，确认属于当前 worktree 后重建该单个缓存，不要复制数据库给其他 worktree。
 
 这些是路径和配置校验，不是新的操作系统沙箱。调用工具时仍沿用 Codex 的权限机制。
 
@@ -93,6 +95,7 @@ pnpm exec nx run @baseline/source:knowledge-find -- 超时 重试 --limit 5
 
 五个 `knowledge-*` Nx 目标均不缓存；`knowledge-check` 和 `knowledge-find` 每次读取当前 Git 状态及笔记。MCP 和 hooks 直接调用公共启动器，避免 Nx 日志混入 MCP 的标准输出协议。
 `pnpm exec nx run @baseline/source:test` 在 Node 环境执行绑定与知识检查测试；根项目 lint、类型检查及现有 CI 覆盖这些脚本和测试，无需 Python 运行时或联网。只读辅助命令使用直接开发依赖 `js-yaml` 解析 frontmatter。
+运行时回归测试使用实际 Node 子进程模拟 MCP 与 hooks，覆盖继承环境变量清理、错误项目路径、默认项目与来源、子进程启动失败、提前退出及超时回收；已安装的 Basic Memory 仍通过本机 doctor 单独验收。
 
 当前包括可靠接入及项目内的按需收录、变更检查和检索回退。长期中文检索质量、真实需求中的知识维护收益及模型成本仍需在后续试点中观察。
 
@@ -108,5 +111,7 @@ pnpm exec nx run @baseline/source:knowledge-find -- 超时 重试 --limit 5
 - 本会话实际收到 Basic Memory 启动上下文，项目为 `vue-nest-baseline`、focus 为 `code/dev`。生命周期收件箱中存在与当前会话 ID 对应的 `session_started` 事件，时间为 `2026-11-10T19:00:56+08:00`、触发源为 `startup`，项目与工作目录均正确。
 
 以上包含新会话 MCP 调用、宿主信任状态和实际启动事件的证据，不以重新运行 doctor 代替验收。
+
+同日补充运行时隔离修复验收：在污染项目映射、默认项目、配置目录、数据库及云模式环境变量后，真实 Basic Memory 的 CLI 项目列表和 doctor 仍确认当前 worktree 绑定；从 `apps/web` 执行配置中的两个 hook 命令均成功，未创建外部探测目录。38 项知识脚本测试、2 项 Web 单测、全量格式、lint、类型检查、构建及 Chromium 冒烟通过；未调整依赖版本。
 
 TODO: 本次未触发会话压缩，PreCompact 已完成本机命令验收及宿主启用、信任核对，但尚未观测真实压缩时的宿主调用。首次实际压缩时核对对应生命周期事件及后续 SessionStart 上下文，再更新本记录；当前不将其记为已完成压缩链路验收。
