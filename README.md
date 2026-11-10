@@ -165,7 +165,7 @@ Commitlint 不使用默认消息豁免；PR CI 检查 base/head SHA 之间全部
 pnpm exec nx run @baseline/source:commitlint -- --edit path/to/message.txt
 ```
 
-提交按可独立审查的逻辑步骤组织，包含必要的测试并保持可构建。远端合并方式以仓库实际规则为准。
+提交按可独立审查的逻辑步骤组织，包含必要的测试并保持可构建。远端仅允许 Rebase Merge。
 
 ## CI 与维护
 
@@ -177,8 +177,9 @@ PR 的汇总检查名为 `Quality`，其他事件为 `CI result`。Action 固定
 
 2026-11-10 已通过 [PR #1 的首次远端 CI 验收](https://github.com/Liranius/vue-nest-baseline/actions/runs/42795421656)，对应提交 `f36b22d`；`Checks` 和 `Quality` 均成功，包含冻结安装、提交信息、格式、lint、类型检查、构建、单测及 Chromium 冒烟。
 
-TODO: `main` 的分支保护和仓库合并策略尚待配置；当前未设置必需检查，三种合并方式均开启。确认平台规则后，将 `Quality` 配为必需检查并验收合并行为，再更新此记录。
-工作流文件本身不配置这些平台规则。
+`main` 已启用 [PR 与 Quality 门禁](https://github.com/Liranius/vue-nest-baseline/rules/26932799)：变更必须通过 PR 合并，并以最新主分支为基底通过 GitHub Actions 提供的 `Quality` 检查。
+规则未设置绕过名单，所需审批人数为 0。已核对平台有效规则及现有 PR 的必需检查列表。
+新建仓库时需单独配置这些平台规则，工作流文件不会自动建立门禁。
 
 依赖按兼容性、修复或实际功能需要更新，保留必要的 Nx 适配。更新后同步版本声明与锁文件，执行完整验收。
 配置例外记录原因、范围和解除条件；维护依赖及规则时一并复查。第三方材料更新还需记录上游版本并复核许可，见 [第三方材料说明](THIRD_PARTY_NOTICES.md)。
