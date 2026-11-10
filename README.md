@@ -1,357 +1,182 @@
-# New Nx Repository
+# vue-nest-baseline
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+Nx monorepo 工程基准，当前包含 Vue 3、Vite、TypeScript、Vue Router、Pinia 应用及 Playwright 浏览器测试。
+项目自有代码采用 [MIT 许可证](LICENSE)；收录的第三方材料及许可见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+## 项目与目录
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/docs/technologies/typescript/introduction?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+| Nx 项目             | 位置                         | 职责                                                                                    |
+| ------------------- | ---------------------------- | --------------------------------------------------------------------------------------- |
+| `@baseline/source`  | [package.json](package.json) | 工作区格式、根配置 lint、类型检查和 Git 钩子目标                                        |
+| `@baseline/web`     | [apps/web](apps/web)         | Vue 应用，入口为 [main.ts](apps/web/src/main.ts) 和 [App.vue](apps/web/src/app/App.vue) |
+| `@baseline/web-e2e` | [apps/web-e2e](apps/web-e2e) | Chromium 冒烟及多浏览器测试                                                             |
 
-🚀 If you haven't connected to Nx Cloud yet, [complete your setup here](https://cloud.nx.app/get-started). Get faster builds with remote caching, distributed task execution, and self-healing CI. [See how your workspace can benefit](#nx-cloud).
-
-## Development environment
-
-Use Node.js 24.21.0 from `.node-version` and pnpm 12.4.2 from `packageManager`.
-The supported Node range is `>=24.21.0 <25`; CI reads `.node-version` directly.
-For example, with fnm installed, run `fnm install` followed by `fnm use` in this
-directory before installing dependencies:
+路由位于 [router](apps/web/src/router)，状态示例位于 [stores](apps/web/src/stores)。单元测试与源码相邻，浏览器测试位于 [apps/web-e2e/src](apps/web-e2e/src)。
+项目目标由 Nx 插件推导和显式配置共同组成，查询时使用完整解析结果：
 
 ```sh
+pnpm exec nx show projects
+pnpm exec nx show project @baseline/web --json
+```
+
+## 初始化
+
+先安装 fnm 并完成 shell 初始化，再在仓库根目录执行：
+
+```sh
+fnm install
+fnm use
+npm install --global pnpm@12.4.2
 pnpm install --frozen-lockfile
 pnpm exec nx run @baseline/source:hooks-install
+pnpm exec nx run @baseline/web:dev
 ```
 
-`pnpm-workspace.yaml` enforces dependency engine and peer dependency compatibility.
-`package.json` uses `devEngines.runtime` with `onFail: error` to enforce the
-`engines.node` range when running pnpm commands. Keep both ranges in sync when
-updating Node, and switch to `.node-version` before running tasks. Direct
-dependencies use exact versions, and `saveExact` keeps future additions exact.
-Update dependency versions deliberately and commit `package.json` together with
-`pnpm-lock.yaml`. The existing dependency build-script allowlist remains in effect.
+Node 固定版本为 [.node-version](.node-version) 中的 `24.21.0`，pnpm 为 [package.json](package.json) 声明的 `12.4.2`。
+支持的 Node 范围为 `>=24.21.0 <25`；`devEngines.runtime` 与 `engines.node` 保持一致，版本不符时拒绝执行 pnpm 命令。
+[pnpm-workspace.yaml](pnpm-workspace.yaml) 开启严格 engine、peer 检查及精确依赖版本；升级时同步版本声明和锁文件，按实际需要维护安装脚本允许列表。
 
-Editor recommendations are listed in `.vscode/extensions.json`, including Vue,
-Vitest, Playwright, ESLint, Oxc, EditorConfig, and Nx Console. `.editorconfig`
-defines UTF-8, two-space indentation, LF line endings, a final newline, and a
-100-character line width; Markdown keeps trailing spaces. Git's `.gitattributes`
-normalizes text to LF and checks out `.cmd` and `.bat` scripts with CRLF.
-Oxfmt remains the formatter used by the workspace targets and Git hooks.
+开发服务默认使用 `http://localhost:4200`，预览默认使用 `http://localhost:4300`，实际地址以终端输出为准。
+编辑器扩展见 [.vscode/extensions.json](.vscode/extensions.json)；[.editorconfig](.editorconfig) 约定 UTF-8、两空格、LF 和行末换行，[.gitattributes](.gitattributes) 保留 Windows 脚本的 CRLF。
 
-## Generate a library
+## 常用命令
 
-```sh
-npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
-```
+以下命令均在仓库根目录执行。
 
-## Run tasks
+| 命令                                             | 用途                                         |
+| ------------------------------------------------ | -------------------------------------------- |
+| `pnpm exec nx run @baseline/web:dev`             | 启动开发服务                                 |
+| `pnpm exec nx run @baseline/web:build`           | 类型检查与生产构建，两项均成功才通过         |
+| `pnpm exec nx run @baseline/web:build-only`      | 仅执行 Vite 构建，可传入 `--mode` 等构建参数 |
+| `pnpm exec nx run-many -t typecheck`             | 检查应用、测试和工程配置的类型               |
+| `pnpm exec nx run @baseline/web:preview`         | 先完成 build，再启动生产预览                 |
+| `pnpm exec nx run @baseline/web:test`            | 单次运行单元测试                             |
+| `pnpm exec nx run @baseline/web:test-watch`      | 监听变更并重跑单元测试，Ctrl+C 退出          |
+| `pnpm exec nx run-many -t lint`                  | 只读执行所有项目的 lint                      |
+| `pnpm exec nx run-many -t lint-fix`              | 自动修复所有项目可修复的 lint 问题           |
+| `pnpm exec nx run @baseline/source:format`       | 使用 Oxfmt 格式化                            |
+| `pnpm exec nx run @baseline/source:format-check` | 只读检查全工作区格式                         |
+| `pnpm exec nx run @baseline/web-e2e:e2e`         | 构建并执行 Chromium 冒烟测试                 |
 
-### Build and type checking
+限定修复范围时可运行 `pnpm exec nx run @baseline/web:lint-fix`，它仍会先修复根工程配置。
+Nx 会在相关任务执行前同步 TypeScript 项目引用；需要手动同步时运行 `pnpm exec nx sync`。
 
-```sh
-pnpm exec nx run @baseline/web:build
-pnpm exec nx run @baseline/web:typecheck
-pnpm exec nx run @baseline/web:build-only
-```
+## Web 开发约定
 
-`build` requires both Vite bundling and Vue/TypeScript checking to succeed.
-`typecheck` checks the app, unit tests, Vite config, and root Vitest config
-independently of bundling.
-Its cache includes test files, TypeScript configs, and dependency versions.
-Type declarations and incremental state are cached in `apps/web/out-tsc`, separate
-from the deployable bundle in `apps/web/dist`.
+### 环境变量
 
-Browser code uses `@vue/tsconfig` with `noUncheckedIndexedAccess`. Unit-test types
-extend the browser configuration and cover `src/**/*.{test,spec}.*`,
-`src/**/__tests__/`, and `tests/`. Node tool configs and browser-test runners use
-`@tsconfig/node24` with explicit Node types. The root Vitest config has its own
-`@baseline/source:typecheck` target and stores outputs in `out-tsc/node`;
-the Web type-check target includes it as a prerequisite. Declaration output stays
-enabled for Nx project references.
+[apps/web/env/.env](apps/web/env/.env) 提供公共默认值，包括用于浏览器标题的 `VITE_APP_TITLE`，无需复制文件即可启动。
+个人覆盖可参考 [.env.example](apps/web/env/.env.example) 创建同目录下的 `.env.local`；本地和模式覆盖文件均被 Git 忽略。
+`VITE_*` 会进入客户端产物，只用于公开配置。
 
-TODO: Revisit the `vue-tsc` 3.x upgrade when the Nx Vue plugin supports it.
-`@nx/vue@24.0.0` declares `vue-tsc ^2.0.0`, so this workspace keeps `2.2.12`
-with strict peer dependency checks enabled.
+Vite 的 `envDir` 指向 `apps/web/env`，避免 Nx 提前加载应用根目录的环境变量而改变模式优先级。
+从高到低依次为进程环境变量、`.env.[mode].local`、`.env.[mode]`、`.env.local`、`.env`。
+开发默认使用 `development`，构建默认使用 `production`；环境文件变更后重启开发服务，预览读取上次构建的值。
 
-`build-only` runs just Vite; pass bundler options such as `--mode` to this target.
-The `preview` and `serve-static` targets depend on the complete `build` check.
+新增公开变量时，同步 [env.d.ts](apps/web/src/env.d.ts)、默认值、示例文件，以及 [project.json](apps/web/project.json) 中 `webEnvironment` 的进程环境输入。
+该输入同时包含被忽略的 `env/.env*` 文件、`VITE_APP_TITLE` 和 `NODE_ENV`，用于构建及单元测试等任务的缓存计算。
 
-Within the Web app, `@/` resolves to `apps/web/src/`, for example `@/router`.
-Vite defines the runtime alias and `tsconfig.app.json` defines the matching
-TypeScript paths; unit tests inherit both through the Vite config and
-`tsconfig.spec.json`. Keep these mappings in sync. This alias is local to the Web
-app; imports from other workspace packages use their package names.
+### 路径、状态与调试
 
-### Vue DevTools
+应用内 `@/` 指向 `apps/web/src/`。修改别名时同步 [Vite 配置](apps/web/vite.config.mts) 与 [应用 tsconfig](apps/web/tsconfig.app.json)，测试继承这些配置。
+跨工作区包的引用使用包名。
 
-Run `pnpm exec nx run @baseline/web:dev` to start the development server with
-Vue DevTools. Open the app and press `Alt+Shift+D` to toggle the panel, or use
-the `/__devtools__/` URL printed by Vite to open it in a separate window.
-The plugin provides component inspection and Vue Router/Pinia debugging.
-Its development overlay is not included in production builds.
+应用入口先注册 Pinia，再注册 Vue Router。[Counter Store](apps/web/src/stores/counter.ts) 提供 `count`、派生值 `doubleCount` 和 `increment` action。
+组件 setup 内可调用 `useCounterStore()`；组件外在 Pinia 安装后使用，或显式传入实例。组件测试各自创建并清理 Pinia 实例，现有测试覆盖状态共享和实例隔离。
 
-### State management
+开发服务启用 Vue DevTools，可用 `Alt+Shift+D` 切换面板，或打开 Vite 输出的 `/__devtools__/` 地址。
+面板支持组件、路由和 Pinia 调试；生产构建不注入开发面板。
 
-The Web entry point registers a fresh Pinia instance before Vue Router.
-`apps/web/src/stores/counter.ts` provides the baseline setup-store example with
-`count`, the derived `doubleCount`, and an `increment` action. Import it with
-`@/stores/counter` and call `useCounterStore()` from component setup; outside
-components, use it after Pinia is installed or pass the instance explicitly.
+### 类型检查
 
-Dependencies include `pinia` and its required `@vue/devtools-api` peer at exact
-versions. Component tests create their own Pinia instance. The store integration
-test checks reactive updates shared by sibling components and state isolation
-between separate instances.
+`@baseline/web:build` 依赖 `build-only` 与 `typecheck`；`preview` 和 `serve-static` 依赖完整的 `build`。
+Web 类型检查覆盖应用、单元测试和 Vite 配置，并先执行根 Vitest 配置的类型检查；E2E 项目单独检查浏览器测试与 Playwright 配置。
 
-### Web environment variables
+浏览器配置继承 `@vue/tsconfig` 并开启 `noUncheckedIndexedAccess`；Node 配置继承 `@tsconfig/node24`。
+单元测试配置覆盖 `src` 下的 spec/test、`__tests__` 和 `tests` 目录，包含 Vitest、Node、jsdom 类型。
+为 Nx 项目引用保留声明输出和增量状态，存放在 `out-tsc` 中；可部署的 Web 产物位于 `apps/web/dist`。
 
-`apps/web/env/.env` provides public defaults, including `VITE_APP_TITLE` for the
-browser tab title. No local configuration is required to start or build the app.
-For personal overrides, copy `apps/web/env/.env.example` to
-`apps/web/env/.env.local`. Local and mode-specific override files are Git-ignored;
-the defaults and example are committed. All `VITE_*` values are exposed to the
-client, so use them only for public configuration.
+TODO: 当前 `@nx/vue@24.0.0` 的 peer 范围要求 `vue-tsc ^2.0.0` 和 `vue-router ^4.0.0`，暂保留 `vue-tsc 2.2.12`、`vue-router 4.6.4`。
+待 Nx 支持目标主版本后，重新评估与 vue-baseline 的版本差异并执行完整回归；保持严格 peer 检查。
 
-Vite's `envDir` points to this directory so Nx does not preload the same files
-into `process.env` and change Vite's precedence. From highest to lowest priority:
-existing process variables, `.env.[mode].local`, `.env.[mode]`, `.env.local`, `.env`.
-Development uses `development`; builds use `production` unless `--mode` is passed
-to `build-only`. Restart the dev server after changing environment files; preview
-serves the values from the last build.
+## 测试
 
-`apps/web/src/env.d.ts` enables strict `import.meta.env` names. When adding a public
-variable, declare it there, provide its default and example, and add its process
-environment input to `webEnvironment` in `apps/web/project.json`. That named input
-extends the app's default inputs, covering builds and all inferred unit-test
-targets. It hashes ignored `env/.env*` files as well as `VITE_APP_TITLE` and
-`NODE_ENV`, so local overrides and shell values cannot reuse stale cached results.
+单元测试使用 Vitest 与 jsdom。`test` 单次运行并可复用 Nx 缓存；`test-watch` 持续运行且不缓存，失败后仍继续监听。
+两者均先构建工作区依赖；CI 使用单次运行入口。
 
-### Unit tests
-
-```sh
-pnpm exec nx run @baseline/web:test
-pnpm exec nx run @baseline/web:test-watch
-```
-
-`test` runs once and can use Nx caching. `test-watch` runs continuously, reruns
-affected tests after file changes, and disables Nx caching. Both use the same
-Vitest configuration and build workspace dependencies first. Stop the watcher
-with Ctrl+C; test failures keep it running so fixing the file can trigger a rerun.
-CI uses the single-run `test` target.
-
-### Browser tests
-
-Install Chromium once, then run the default smoke test:
+浏览器测试首次运行前安装 Chromium：
 
 ```sh
 pnpm exec playwright install chromium
 pnpm exec nx run @baseline/web-e2e:e2e
 ```
 
-For all three browsers:
+需要验证 Chromium、Firefox 和 WebKit 时：
 
 ```sh
 pnpm exec playwright install chromium firefox webkit
 pnpm exec nx run @baseline/web-e2e:e2e --configuration=all
 ```
 
-Both commands build and type-check first, then start a fresh production preview
-at `http://127.0.0.1:4173`. Playwright stops the server when the run ends and fails
-if the port is already occupied. E2E results are not cached; build and type-check
-tasks retain their caches. Use the Nx entry points so their prerequisites run.
-The existing `BASE_URL` override changes the test destination while the local
-preview still starts; leave it unset to test this checkout's production bundle.
+E2E 目标先执行类型检查和构建，再由 Playwright 启动 `http://127.0.0.1:4173` 的全新生产预览，结束后关闭服务。
+端口占用时失败，不复用已有服务。E2E 结果不缓存，构建和类型检查仍可使用缓存；使用上述 Nx 入口以确保前置任务执行。
+`BASE_URL` 只改变测试访问地址，本地预览仍会启动；验证当前工作区产物时保持该变量未设置。
 
-Failed tests retain screenshots and traces under
-`apps/web-e2e/test-output/playwright/output/`. The HTML report is written to
-`apps/web-e2e/test-output/playwright/report/` without opening automatically.
-CI runs the Chromium smoke test and uploads these directories on failure,
-retaining them for seven days.
+失败截图和 trace 位于 `apps/web-e2e/test-output/playwright/output/`，HTML 报告位于 `apps/web-e2e/test-output/playwright/report/`，不会自动打开。
+CI 在浏览器测试失败时上传报告，保留七天。配置入口为 [playwright.config.mts](apps/web-e2e/playwright.config.mts)。
 
-### Formatting
+## 质量检查与提交
 
-Oxfmt is the project's formatter. Use these Nx project targets locally and in CI:
+Oxfmt 是格式化工具，配置见 [.oxfmtrc.json](.oxfmtrc.json)。Web lint 包含 Oxlint、支持类型检查的 ESLint、Vue/Vitest 规则及 Stylelint；E2E 启用 Playwright 规则。
+Web 和 E2E 的 lint 都包含根配置检查。`eslint-config-prettier` 用于关闭冲突的格式规则，`eslint-plugin-oxlint` 关闭与 Oxlint 重复的规则。
+生成物和收录的第三方技能目录被排除，项目自有代码、配置和文档仍接受检查。
 
-```sh
-pnpm exec nx run @baseline/source:format
-pnpm exec nx run @baseline/source:format-check
-```
+`lint` 和 `format-check` 为只读检查。`lint-fix` 不缓存，顺序执行适用的 Oxlint、ESLint、Stylelint 修复；剩余错误会使任务失败，已完成的修复保留。
+Web 样式检查显式指定根 Stylelint 配置，保证 `NODE_ENV=test` 时也能使用同一配置。修复后审查差异，再运行只读检查。
 
-`format` rewrites files; `format-check` checks the whole workspace without writing.
-The configuration enables single quotes, import sorting, and Tailwind class sorting.
-Generated outputs and bundled third-party Nx skills are excluded from formatting;
-project code, configuration, and documentation remain checked.
+### 本地验收
 
-### Lint
-
-Run all code and style checks through Nx:
+应用、依赖及工程配置修改完成后执行：
 
 ```sh
-pnpm exec nx run-many -t lint
+pnpm exec nx run-many -t format-check lint test build typecheck
 ```
 
-The `@baseline/web:lint` target runs Oxlint, type-aware ESLint (including Vue
-and Vitest rules), and Stylelint for CSS and Vue styles. `@baseline/web-e2e:lint`
-also runs ESLint with Playwright rules. Both include `@baseline/source:lint`,
-which checks the root ESLint, Stylelint, and Vitest configuration files.
-
-The `lint` targets check without changing files and are used by CI. To apply
-available fixes across all projects or just the Web app:
+页面、路由、样式、构建、依赖及检查配置变更还需执行 Chromium 冒烟：
 
 ```sh
-pnpm exec nx run-many -t lint-fix
-pnpm exec nx run @baseline/web:lint-fix
+pnpm exec nx run @baseline/web-e2e:e2e
 ```
 
-Each `lint-fix` target disables Nx caching and runs its applicable checkers in
-order: Oxlint, ESLint, then Stylelint for Web styles. Web and E2E run the root
-configuration fixes first. Remaining errors fail the command; fixes already
-applied are kept in the working tree. Review the diff, then rerun `lint`.
-Both Web style-checking commands explicitly select the root Stylelint config,
-including when `NODE_ENV=test` limits automatic config discovery.
-Formatting is handled separately by the `format` target.
+纯文档修改核对内容、命令、链接，并运行 `git diff --check` 和改动文件的格式检查。
+按修改类型选择验证范围，具体要求见 [AGENTS.md](AGENTS.md)。
 
-`eslint-config-prettier` only disables conflicting ESLint
-format rules; it does not install or run a formatter. Oxfmt handles formatting,
-and `eslint-plugin-oxlint` disables ESLint rules already checked by Oxlint.
+### Git 钩子与提交信息
 
-### Git hooks and commit messages
+每个 checkout 在依赖安装后执行 `pnpm exec nx run @baseline/source:hooks-install`。
+[Lefthook](lefthook.yml) 的 `pre-commit` 按顺序修复暂存文件的 Oxlint、ESLint、Stylelint 和格式问题，并重新暂存修复结果；提交前后均需审查差异。
+钩子目标禁用缓存，依赖安装不会自动安装钩子。CI 仍对完整工作区进行只读检查。
 
-After installing dependencies, install the hooks once in each checkout:
-
-```sh
-pnpm exec nx run @baseline/source:hooks-install
-```
-
-Lefthook's `pre-commit` hook runs Oxlint, ESLint, Stylelint, then Oxfmt on
-applicable staged files. It fixes files and stages the fixes automatically.
-Generated outputs and bundled third-party skills are excluded. The hook targets
-disable Nx caching because they depend on the current Git index and modify files.
-CI still checks the whole workspace without applying fixes.
-
-The `commit-msg` hook uses Commitlint's Conventional Commits preset, with no
-default message exemptions. For example, use `feat(web): add settings page`
-or `fix(web): handle missing user`. PR CI checks every non-merge commit between
-the PR's base and head; checking only the latest commit or PR title is insufficient.
-
-To check a message file manually:
+提交信息采用 Conventional Commits，例如 `feat(web): add settings page`、`fix(web): handle missing user`。
+Commitlint 不使用默认消息豁免；PR CI 检查 base/head SHA 之间全部非 merge 提交，不只检查最后一条提交或 PR 标题。
+手动检查消息文件：
 
 ```sh
 pnpm exec nx run @baseline/source:commitlint -- --edit path/to/message.txt
 ```
 
-Lefthook's dependency install script is disabled in `pnpm-workspace.yaml`;
-hook installation is explicit through the Nx target above.
+提交按可独立审查的逻辑步骤组织，包含必要的测试并保持可构建。远端合并方式以仓库实际规则为准。
 
-To build the library use:
+## CI 与维护
 
-```sh
-npx nx run pkg1:build
-```
+[GitHub Actions](.github/workflows/ci.yml) 在 PR 创建、更新、重新打开或编辑时，以及 `main` 推送和手动触发时运行。
+同一工作流、事件及 ref 的新运行会取消旧运行。`Checks` 限时 15 分钟，执行冻结安装、PR 提交信息校验、格式、lint、单元测试、类型检查、构建和 Chromium 冒烟。
 
-To run any task with Nx use:
+最终校验要求每个必需步骤的原始 `outcome` 都成功。汇总 job 限时两分钟，同时要求 `Checks` 成功和 `verified=true`，失败、跳过或取消不能通过。
+PR 的汇总检查名为 `Quality`，其他事件为 `CI result`。Action 固定完整提交 SHA，[Dependabot](.github/dependabot.yml) 每周检查 Action 更新。
 
-```sh
-npx nx run <project-name>:<target>
-```
+TODO: 远端 CI 实跑、分支保护和合并策略尚待验收；有对应授权时验证实际运行，并在平台将 `Quality` 配为必需检查。
+工作流文件本身不配置这些平台规则，通过远端验证后更新此记录。
 
-These targets are either [inferred automatically](https://nx.dev/docs/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
-
-[More about running tasks in the docs &raquo;](https://nx.dev/docs/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Continuous integration
-
-GitHub Actions runs on pull requests, pushes to `main`, and manual dispatches.
-For the same workflow, event, and ref, a new run cancels the previous run.
-The `Checks` job has a 15-minute timeout and runs the existing Nx formatting,
-lint, unit-test, build, type-check, and Chromium smoke-test targets after a frozen
-dependency install. Pull requests also validate all non-merge commit messages
-between the event's base and head SHAs. Browser failures retain the report and
-traces for seven days.
-
-The final verifier requires every mandatory step's original `outcome` to be
-`success`, including commit validation on pull requests. The separate summary job
-requires both a successful `Checks` job and its explicit `verified=true` output;
-failed, skipped, missing, or cancelled checks cannot satisfy this gate. Its timeout
-is two minutes, and a cancelled workflow is explicitly rejected.
-
-The summary is named `Quality` on pull requests and `CI result` on other events.
-When configuring GitHub branch rules, select `Quality` as the required check;
-these workflow files do not configure branch rules themselves.
-
-Actions use full commit SHA pins with version comments. Checkout fetches full
-history without persisting credentials. Dependabot checks GitHub Actions updates
-weekly; dependency updates still require review and CI.
-
-## Versioning and releasing
-
-To version and release the library use
-
-```
-npx nx release
-```
-
-Pass `--dry-run` to see what would happen without actually releasing the library.
-
-[Learn more about Nx release &raquo;](https://nx.dev/docs/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Keep TypeScript project references up to date
-
-Nx automatically updates TypeScript [project references](https://www.typescriptlang.org/docs/handbook/project-references.html) in `tsconfig.json` files to ensure they remain accurate based on your project dependencies (`import` or `require` statements). This sync is automatically done when running tasks such as `build` or `typecheck`, which require updated references to function correctly.
-
-To manually trigger the process to sync the project graph dependencies information to the TypeScript project references, run the following command:
-
-```sh
-npx nx sync
-```
-
-You can enforce that the TypeScript project references are always in the correct state when running in CI by adding a step to your CI job configuration that runs the following command:
-
-```sh
-npx nx sync:check
-```
-
-[Learn more about nx sync](https://nx.dev/reference/nx-commands#sync)
-
-## Nx Cloud
-
-Nx Cloud ensures a [fast and scalable CI](https://nx.dev/nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
-
-- [Remote caching](https://nx.dev/docs/features/ci-features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/docs/features/ci-features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/docs/features/ci-features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/docs/features/ci-features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-### Set up CI (non-Github Actions CI)
-
-**Note:** This is only required if your CI provider is not GitHub Actions.
-
-Use the following command to configure a CI workflow for your workspace:
-
-```sh
-npx nx g ci-workflow
-```
-
-[Learn more about Nx on CI](https://nx.dev/docs/features/ci-features?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Install Nx Console
-
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
-
-[Install Nx Console &raquo;](https://nx.dev/docs/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## 🔗 Learn More
-
-- [Nx Documentation](https://nx.dev/docs)
-- [Crafting Your Workspace Tutorial](https://nx.dev/docs/getting-started/tutorials/crafting-your-workspace)
-- [Module Boundaries](https://nx.dev/docs/features/enforce-module-boundaries)
-- [Releasing Packages](https://nx.dev/docs/features/manage-releases)
-- [Nx Plugins](https://nx.dev/docs/concepts/nx-plugins)
-- [Nx Cloud](https://nx.dev/nx-cloud)
-
-## 💬 Community
-
-Join the Nx community:
-
-- [Discord](https://go.nx.dev/community)
-- [X (Twitter)](https://twitter.com/nxdevtools)
-- [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [YouTube](https://www.youtube.com/@nxdevtools)
-- [Blog](https://nx.dev/blog)
+依赖按兼容性、修复或实际功能需要更新，保留必要的 Nx 适配。更新后同步版本声明与锁文件，执行完整验收。
+配置例外记录原因、范围和解除条件；维护依赖及规则时一并复查。第三方材料更新还需记录上游版本并复核许可，见 [第三方材料说明](THIRD_PARTY_NOTICES.md)。

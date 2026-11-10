@@ -1,3 +1,8 @@
+# 项目工作入口
+
+本仓库的工作约定、验证要求和交付要求统一见 [AGENTS.md](AGENTS.md)，初始化及日常命令见 [README.md](README.md)。
+下方保留 Nx 自动维护的说明。
+
 <!-- nx configuration start-->
 <!-- Leave the start & end comments to automatically receive updates. -->
 
