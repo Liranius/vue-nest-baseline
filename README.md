@@ -114,10 +114,25 @@ TODO: 当前 `@nx/vue@24.0.0` 的 peer 范围要求 `vue-tsc ^2.0.0` 和 `vue-ro
 项目适配维护在 AGENTS.md 和 system.md，不修改上游 skill；该目录沿用现有第三方技能的 Oxfmt 排除规则，项目自有文档仍正常检查。
 升级时复查排除范围、审查指令与资源变化并更新版本记录，并复验未初始化设计、保存与新会话读取三条路径。
 
+## 项目知识
+
+本项目可选接入 Basic Memory，用于伴随开发保存和读取知识。安装、worktree 绑定与启动核查见 [项目知识接入](docs/project-knowledge.md)。先安装 uv，再执行：
+
+```sh
+pnpm exec nx run @baseline/source:knowledge-setup
+pnpm exec nx run @baseline/source:knowledge-doctor
+```
+
+开发中的知识收录和维护由项目技能衔接；可用 `pnpm exec nx run @baseline/source:knowledge-check` 查看受变更影响的笔记，用 `pnpm exec nx run @baseline/source:knowledge-find -- 关键词` 做本地检索回退。
+知识文件位于当前 worktree 的 `docs/knowledge/`，随 Git 审查和合并；运行时和索引保留在用户缓存。使用新 Codex 会话加载项目 MCP 与官方技能，并审查、信任项目 hooks；人工开发和 CI 不需要安装 Basic Memory。
+
 ## 测试
 
 单元测试使用 Vitest 与 jsdom。`test` 单次运行并可复用 Nx 缓存；`test-watch` 持续运行且不缓存，失败后仍继续监听。
 两者均先构建工作区依赖；CI 使用单次运行入口。
+
+根项目的 `pnpm exec nx run @baseline/source:test` 在 Node 环境中验证知识脚本，包括 worktree 隔离、失效配置拒绝、变更关联和中文检索；不需要安装 Basic Memory 或联网。
+这些测试纳入现有 `nx run-many -t test`，与 Web 的 jsdom 测试分别运行。
 
 浏览器测试首次运行前安装 Chromium：
 

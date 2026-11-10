@@ -9,7 +9,11 @@
     "**/coverage/**",
     "**/test-output/**",
     ".nx/**",
-    ".agents/skills/**",
+    ".agents/skills/nx-*/**",
+    ".agents/skills/link-workspace-packages/**",
+    ".agents/skills/monitor-ci/**",
+    ".agents/skills/interface-design/**",
+    ".agents/skills/bm-*/**",
     ".cursor/skills/**",
     ".github/skills/**",
     ".opencode/skills/**"

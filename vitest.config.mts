@@ -3,10 +3,15 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     projects: [
-      '**/vite.config.{mjs,js,ts,mts}',
-      '**/vitest.config.{mjs,js,ts,mts}',
-      '!vitest.config.{mjs,js,ts,mts}',
-      '!vite.config.{mjs,js,ts,mts}',
+      {
+        test: {
+          name: 'source',
+          environment: 'node',
+          include: ['tests/**/*.test.ts'],
+        },
+      },
+      'apps/*/vite.config.{mjs,js,ts,mts}',
+      'apps/*/vitest.config.{mjs,js,ts,mts}',
     ],
   },
 });

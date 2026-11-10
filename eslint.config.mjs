@@ -11,6 +11,7 @@ import { globalIgnores } from 'eslint/config';
 import globals from 'globals';
 
 const unitTests = [
+  'tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts}',
   'apps/web/src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
   'apps/web/src/**/__tests__/**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
   'apps/web/tests/**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
@@ -39,6 +40,7 @@ export default withVueTs(
   {
     files: [
       '*.config.{js,mjs,cjs,ts,mts,cts}',
+      'scripts/**/*.{js,mjs,cjs}',
       'apps/*/*.config.{js,mjs,cjs,ts,mts,cts}',
       'apps/web-e2e/**/*.{js,mjs,cjs,ts,mts,cts}',
     ],

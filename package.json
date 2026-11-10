@@ -43,6 +43,7 @@
     "eslint-plugin-vue": "10.11.0",
     "globals": "17.12.0",
     "jiti": "2.7.0",
+    "js-yaml": "4.3.2",
     "jsdom": "30.1.0",
     "lefthook": "2.1.14",
     "nx": "24.0.0",
@@ -81,6 +82,7 @@
         "inputs": [
           "{workspaceRoot}/*.config.{ts,mts,cts}",
           "{workspaceRoot}/config/**/*.{ts,mts,cts}",
+          "{workspaceRoot}/tests/**/*.ts",
           "{workspaceRoot}/tsconfig.base.json",
           "{workspaceRoot}/tsconfig.node.json",
           "{workspaceRoot}/package.json",
@@ -98,6 +100,58 @@
         "cache": false,
         "options": {
           "command": "lefthook install"
+        }
+      },
+      "knowledge-setup": {
+        "executor": "nx:run-commands",
+        "cache": false,
+        "options": {
+          "command": "node scripts/knowledge.mjs setup"
+        }
+      },
+      "knowledge-doctor": {
+        "executor": "nx:run-commands",
+        "cache": false,
+        "options": {
+          "command": "node scripts/knowledge.mjs doctor"
+        }
+      },
+      "knowledge-cli": {
+        "executor": "nx:run-commands",
+        "cache": false,
+        "options": {
+          "command": "node scripts/knowledge.mjs cli"
+        }
+      },
+      "knowledge-check": {
+        "executor": "nx:run-commands",
+        "cache": false,
+        "options": {
+          "command": "node scripts/knowledge-review.mjs check"
+        }
+      },
+      "knowledge-find": {
+        "executor": "nx:run-commands",
+        "cache": false,
+        "options": {
+          "command": "node scripts/knowledge-review.mjs find"
+        }
+      },
+      "test": {
+        "executor": "nx:run-commands",
+        "cache": true,
+        "dependsOn": [],
+        "inputs": [
+          "{workspaceRoot}/scripts/**",
+          "{workspaceRoot}/tests/**",
+          "{workspaceRoot}/.codex/**",
+          "{workspaceRoot}/vitest.config.mts",
+          "{workspaceRoot}/tsconfig*.json",
+          "{workspaceRoot}/package.json",
+          "{workspaceRoot}/pnpm-lock.yaml"
+        ],
+        "options": {
+          "command": "vitest run --project source"
         }
       },
       "commitlint": {
@@ -155,8 +209,8 @@
         "cache": false,
         "options": {
           "commands": [
-            "oxlint eslint.config.mjs stylelint.config.mjs commitlint.config.mjs vitest.config.mts --fix",
-            "eslint eslint.config.mjs stylelint.config.mjs commitlint.config.mjs vitest.config.mts --fix"
+            "oxlint eslint.config.mjs stylelint.config.mjs commitlint.config.mjs vitest.config.mts scripts tests --fix",
+            "eslint eslint.config.mjs stylelint.config.mjs commitlint.config.mjs vitest.config.mts scripts tests --fix"
           ],
           "parallel": false,
           "forwardAllArgs": false
@@ -168,12 +222,14 @@
         "inputs": [
           "lintGlobals",
           "{workspaceRoot}/*.config.{js,mjs,cjs,ts,mts,cts}",
+          "{workspaceRoot}/scripts/**",
+          "{workspaceRoot}/tests/**",
           "{workspaceRoot}/tsconfig.json"
         ],
         "options": {
           "commands": [
-            "oxlint eslint.config.mjs stylelint.config.mjs commitlint.config.mjs vitest.config.mts",
-            "eslint eslint.config.mjs stylelint.config.mjs commitlint.config.mjs vitest.config.mts"
+            "oxlint eslint.config.mjs stylelint.config.mjs commitlint.config.mjs vitest.config.mts scripts tests",
+            "eslint eslint.config.mjs stylelint.config.mjs commitlint.config.mjs vitest.config.mts scripts tests"
           ],
           "parallel": false
         }
