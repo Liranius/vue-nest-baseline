@@ -175,8 +175,10 @@ pnpm exec nx run @baseline/source:commitlint -- --edit path/to/message.txt
 最终校验要求每个必需步骤的原始 `outcome` 都成功。汇总 job 限时两分钟，同时要求 `Checks` 成功和 `verified=true`，失败、跳过或取消不能通过。
 PR 的汇总检查名为 `Quality`，其他事件为 `CI result`。Action 固定完整提交 SHA，[Dependabot](.github/dependabot.yml) 每周检查 Action 更新。
 
-TODO: 远端 CI 实跑、分支保护和合并策略尚待验收；有对应授权时验证实际运行，并在平台将 `Quality` 配为必需检查。
-工作流文件本身不配置这些平台规则，通过远端验证后更新此记录。
+2026-11-10 已通过 [PR #1 的首次远端 CI 验收](https://github.com/Liranius/vue-nest-baseline/actions/runs/42795421656)，对应提交 `f36b22d`；`Checks` 和 `Quality` 均成功，包含冻结安装、提交信息、格式、lint、类型检查、构建、单测及 Chromium 冒烟。
+
+TODO: `main` 的分支保护和仓库合并策略尚待配置；当前未设置必需检查，三种合并方式均开启。确认平台规则后，将 `Quality` 配为必需检查并验收合并行为，再更新此记录。
+工作流文件本身不配置这些平台规则。
 
 依赖按兼容性、修复或实际功能需要更新，保留必要的 Nx 适配。更新后同步版本声明与锁文件，执行完整验收。
 配置例外记录原因、范围和解除条件；维护依赖及规则时一并复查。第三方材料更新还需记录上游版本并复核许可，见 [第三方材料说明](THIRD_PARTY_NOTICES.md)。
