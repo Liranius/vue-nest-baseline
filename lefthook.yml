@@ -6,7 +6,11 @@ pre-commit:
   exclude:
     - '**/{dist,out-tsc,coverage,test-output,playwright-report,test-results}/**'
     - '.nx/**'
-    - '.agents/skills/**'
+    - '.agents/skills/nx-*/**'
+    - '.agents/skills/link-workspace-packages/**'
+    - '.agents/skills/monitor-ci/**'
+    - '.agents/skills/interface-design/**'
+    - '.agents/skills/bm-*/**'
     - '.cursor/skills/**'
     - '.github/skills/**'
     - '.opencode/skills/**'
