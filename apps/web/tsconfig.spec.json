@@ -4,7 +4,7 @@
     "rootDir": ".",
     "outDir": "./out-tsc/vitest",
     "tsBuildInfoFile": "./out-tsc/vitest/tsconfig.spec.tsbuildinfo",
-    "types": ["vitest/globals", "vitest/importMeta", "vite/client", "node"]
+    "types": ["vitest/globals", "vitest/importMeta", "vite/client", "node", "jsdom"]
   },
   "include": [
     "src/**/*.test.*",
