@@ -32,8 +32,9 @@ pnpm exec nx run @baseline/source:hooks-install
 pnpm exec nx run @baseline/web:dev
 ```
 
-Node 固定版本为 [.node-version](.node-version) 中的 `24.21.0`，pnpm 为 [package.json](package.json) 声明的 `12.4.2`。
-支持的 Node 范围为 `>=24.21.0 <25`；`devEngines.runtime` 与 `engines.node` 保持一致，版本不符时拒绝执行 pnpm 命令。
+Node 固定版本为 [.node-version](.node-version) 中的 `24.22.2`，pnpm 为 [package.json](package.json) 声明的 `12.4.2`。
+支持的 Node 范围为 `>=24.22.2 <25`；`devEngines.runtime` 与 `engines.node` 保持一致，版本不符时拒绝执行 pnpm 命令。
+该运行时包含内置 Undici `7.30.1` 的[安全修复](https://nodejs.org/en/blog/release/v24.22.1)；npm 中的 Undici 与 Node 原生 `fetch` 使用的内置副本分别维护，升级前者不能替代运行时升级。
 [pnpm-workspace.yaml](pnpm-workspace.yaml) 开启严格 engine、peer 检查及精确依赖版本；升级时同步版本声明和锁文件，按实际需要维护安装脚本允许列表。
 
 开发服务默认使用 `http://localhost:4200`，预览默认使用 `http://localhost:4300`，实际地址以终端输出为准。
@@ -96,7 +97,7 @@ Web 类型检查覆盖应用、单元测试和 Vite 配置，并先执行根 Vit
 单元测试配置覆盖 `src` 下的 spec/test、`__tests__` 和 `tests` 目录，包含 Vitest、Node、jsdom 类型。
 为 Nx 项目引用保留声明输出和增量状态，存放在 `out-tsc` 中；可部署的 Web 产物位于 `apps/web/dist`。
 
-TODO: 当前 `@nx/vue@24.0.0` 的 peer 范围要求 `vue-tsc ^2.0.0` 和 `vue-router ^4.0.0`，暂保留 `vue-tsc 2.2.12`、`vue-router 4.6.4`。
+TODO: 当前 `@nx/vue@24.0.3` 的 peer 范围要求 `vue-tsc ^2.0.0` 和 `vue-router ^4.0.0`，暂保留 `vue-tsc 2.2.12`、`vue-router 4.6.4`。
 待 Nx 支持目标主版本后，重新评估与 vue-baseline 的版本差异并执行完整回归；保持严格 peer 检查。
 
 ## UI 辅助开发
@@ -213,3 +214,9 @@ PR 的汇总检查名为 `Quality`，其他事件为 `CI result`。Action 固定
 
 依赖按兼容性、修复或实际功能需要更新，保留必要的 Nx 适配。更新后同步版本声明与锁文件，执行完整验收。
 配置例外记录原因、范围和解除条件；维护依赖及规则时一并复查。第三方材料更新还需记录上游版本并复核许可，见 [第三方材料说明](THIRD_PARTY_NOTICES.md)。
+
+### 依赖安全待办
+
+TODO: [Minimatch 告警 GHSA-g3hv-75wg-m249](https://github.com/isaacs/minimatch/security/advisories/GHSA-g3hv-75wg-m249) 仍影响工具链中的 9/10 系列。恶意模式在 `optimizationLevel: 2` 时可造成资源耗尽；当前 `glob` 具备该条件，但未发现项目检查调用其上游 `js-beautify` CLI。修复版 11 删除了 Nx 正在使用的 `makeRe` 等 API，不能全局 override。待上游兼容升级或单独验证保留旧 API 的安全回补后解除；不忽略该告警，也不因此升级保留的 Vue 依赖。
+
+TODO: `@vue/test-utils → js-beautify → glob 13.0.6` 存在 [GHSA-3g3m-2fjr-6pw4](https://github.com/isaacs/node-glob/security/advisories/GHSA-3g3m-2fjr-6pw4)：使用 `AbortSignal` 限制遍历时，取消后可能继续消耗文件系统 I/O 和 CPU。当前 `js-beautify` CLI 使用不带 signal 的同步调用，未发现项目运行该 CLI，但漏洞版本仍在依赖树中。待上游引入修复版 `glob >=14.0.2` 或完成兼容回补与回归验证后解除；与 Minimatch 工具链适配一起评估。
