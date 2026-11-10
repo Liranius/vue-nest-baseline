@@ -99,6 +99,21 @@ Web 类型检查覆盖应用、单元测试和 Vite 配置，并先执行根 Vit
 TODO: 当前 `@nx/vue@24.0.0` 的 peer 范围要求 `vue-tsc ^2.0.0` 和 `vue-router ^4.0.0`，暂保留 `vue-tsc 2.2.12`、`vue-router 4.6.4`。
 待 Nx 支持目标主版本后，重新评估与 vue-baseline 的版本差异并执行完整回归；保持严格 peer 检查。
 
+## UI 辅助开发
+
+仓库内提供 [interface-design](.agents/skills/interface-design/SKILL.md)，用于产品界面的设计、实现和审查；营销页面、品牌策划等不在其适用范围。它是可选的 agent 指导，不影响人工开发、构建、测试和 CI。
+
+在本仓库使用支持 `.agents/skills` 的 Codex 时，可明确要求“使用 interface-design”，或由 agent 按任务匹配；若会话未发现该 skill，重新打开会话并核对加载的是仓库内版本。这里安装的是 skill，上游文档中的插件斜杠命令不随之安装，可用自然语言提出设计审查等任务。
+
+1. 读取 [DESIGN.md](DESIGN.md)、需求与相关实现。本基准的初始状态为“业务设计尚未建立”，后续以 DESIGN.md 的实际状态为准；基准示例的配色、字体与布局均不代表业务选择。
+2. 首次业务 UI 任务先明确用户、核心任务、关键状态与设计方向，按不确定性提供候选或可运行原型。方向含糊或更改成本高时由维护者选择；已明确授权的取舍直接执行。
+3. 在 `apps/web` 中沿用 Vue 和现有样式组织方式实现，并通过浏览器迭代；核查布局、交互、键盘与焦点以及适用状态，执行 [AGENTS.md](AGENTS.md#验证要求) 规定的 Nx 检查。设计与代码可以迭代，不强制先生成独立图片设计稿。
+4. 将已确认或授权决定的设计结论保存到 DESIGN.md，更新状态与适用范围；后续任务沿用并按需更新。[system.md](.interface-design/system.md) 只保留入口，具体 token 与组件定义引用源码。
+
+本次与 vue-baseline 接入相同的固定上游版本，来源、提交和 MIT 许可见 [第三方材料说明](THIRD_PARTY_NOTICES.md#interface-design)。
+项目适配维护在 AGENTS.md 和 system.md，不修改上游 skill；该目录沿用现有第三方技能的 Oxfmt 排除规则，项目自有文档仍正常检查。
+升级时复查排除范围、审查指令与资源变化并更新版本记录，并复验未初始化设计、保存与新会话读取三条路径。
+
 ## 测试
 
 单元测试使用 Vitest 与 jsdom。`test` 单次运行并可复用 Nx 缓存；`test-watch` 持续运行且不缓存，失败后仍继续监听。

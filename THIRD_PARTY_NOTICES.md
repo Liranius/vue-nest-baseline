@@ -2,6 +2,12 @@
 
 本仓库自有代码适用 [MIT 许可证](LICENSE)。直接收录的第三方材料保留各自的版权和许可；包管理器安装的依赖遵循各自许可证。
 
+## interface-design
+
+[.agents/skills/interface-design](.agents/skills/interface-design) 来自 [Dammyjay93/interface-design](https://github.com/Dammyjay93/interface-design/tree/2f9be3206855bcb2d1d0af262c8bae25cba6658d/.claude/skills/interface-design)，固定提交 `2f9be3206855bcb2d1d0af262c8bae25cba6658d`，于 2026-11-10 接入，与 vue-baseline 收录的版本一致。
+保留上游技能、agent 配置和 [MIT 许可证](.agents/skills/interface-design/LICENSE)，版权为 `Copyright (c) 2026 Damola Akinleye`。
+项目适配写在 [AGENTS.md](AGENTS.md) 与 [设计入口](.interface-design/system.md)，设计知识维护于 [DESIGN.md](DESIGN.md)，不修改上游技能文件。
+
 ## Nx AI 配置材料
 
 来源：[nrwl/nx-ai-agents-config](https://github.com/nrwl/nx-ai-agents-config)。Nx 的 AI 配置工具从该仓库的 `generated` 目录生成各 agent 的配置材料。

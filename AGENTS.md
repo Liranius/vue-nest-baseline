@@ -14,6 +14,12 @@
 - 有意保留的临时方案、例外和推迟事项，以 `TODO:` 记录原因、影响及解除条件；同一问题保留一份主要记录，其他位置引用。未知信息明确标为待确认。
 - 应用内使用现有 `@/` 别名，跨工作区依赖使用包名；沿用现有路由、Pinia 和样式组织方式。
 
+## UI 工作
+
+- 产品界面的设计、实现与审查使用仓库内的 [interface-design](.agents/skills/interface-design/SKILL.md)，先读取 [DESIGN.md](DESIGN.md) 及相关实现；营销页面等超出该 skill 范围的任务另行选择。项目需求与已确认设计约束优先于通用风格建议，实现沿用 Vue 和现有样式组织方式。
+- [system.md](.interface-design/system.md) 只作入口；skill 的“保存设计模式”操作映射为更新 DESIGN.md。是否需要初始化以 DESIGN.md 的状态为准，不能因入口文件存在就认定设计已定稿；流程见 [README](README.md#ui-辅助开发)。
+- 仅保存已确认或用户授权决定的设计结论，待确认项明确标注；既有授权不重复询问。设计意图与适用范围写入 DESIGN.md，token 数值和组件行为引用源码，避免双份维护。
+
 ## 验证要求
 
 - 文档修改核对内容、命令、路径和链接，执行 `git diff --check`，并通过 Nx 检查改动文件格式，例如 `pnpm exec nx run @baseline/source:format -- --check README.md AGENTS.md CLAUDE.md THIRD_PARTY_NOTICES.md`。
