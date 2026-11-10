@@ -168,11 +168,40 @@ describe('repo knowledge binding', () => {
     expect(result.stderr).toContain('Stale worktree binding');
   });
 
-  it('reports a missing runtime before attempting to start MCP', () => {
+  it.each([{ database_backend: 'postgres' }, { database_url: 'sqlite+aiosqlite:///foreign.db' }])(
+    'rejects a database override in the persisted configuration: %j',
+    (override) => {
+      const { root, cache } = fixture();
+      const current = binding(root, cache);
+      const path = join(current.settings, 'config.json');
+      const config = JSON.parse(readFileSync(path, 'utf8')) as Record<string, unknown>;
+      const changed = JSON.stringify({ ...config, ...override });
+      writeFileSync(path, changed);
+      const result = run(root, cache);
+      expect(result.status).not.toBe(0);
+      expect(result.stderr).toContain('worktree-local SQLite');
+      expect(readFileSync(path, 'utf8')).toBe(changed);
+    },
+  );
+
+  it('rejects malformed hook input before attempting to start the runtime', () => {
     const { root, cache } = fixture();
-    const result = run(root, cache, root, ['mcp']);
+    const result = run(root, cache, root, ['hook', 'session-start'], '{invalid');
     expect(result.status).not.toBe(0);
     expect(result.stdout).toBe('');
-    expect(result.stderr).toContain('pnpm exec nx run @baseline/source:knowledge-setup');
+    expect(result.stderr).toMatch(/JSON|property name/);
+    expect(result.stderr).not.toContain('knowledge-setup');
   });
+
+  it.each(['mcp', 'session-start', 'pre-compact'])(
+    'reports a missing runtime before starting %s',
+    (mode) => {
+      const { root, cache } = fixture();
+      const args = mode === 'mcp' ? ['mcp'] : ['hook', mode];
+      const result = run(root, cache, root, args, JSON.stringify({ cwd: root }));
+      expect(result.status).not.toBe(0);
+      expect(result.stdout).toBe('');
+      expect(result.stderr).toContain('pnpm exec nx run @baseline/source:knowledge-setup');
+    },
+  );
 });
