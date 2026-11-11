@@ -4,6 +4,8 @@ packages:
 engineStrict: true
 strictPeerDependencies: true
 saveExact: true
+overrides:
+  'js-beautify@2.0.3>glob': '14.0.4'
 allowBuilds:
   '@swc/core@1.15.8': true
   nx@24.0.3: true

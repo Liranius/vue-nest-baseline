@@ -217,6 +217,6 @@ PR 的汇总检查名为 `Quality`，其他事件为 `CI result`。Action 固定
 
 ### 依赖安全待办
 
-TODO: [Minimatch 告警 GHSA-g3hv-75wg-m249](https://github.com/isaacs/minimatch/security/advisories/GHSA-g3hv-75wg-m249) 仍影响工具链中的 9/10 系列。恶意模式在 `optimizationLevel: 2` 时可造成资源耗尽；当前 `glob` 具备该条件，但未发现项目检查调用其上游 `js-beautify` CLI。修复版 11 删除了 Nx 正在使用的 `makeRe` 等 API，不能全局 override。待上游兼容升级或单独验证保留旧 API 的安全回补后解除；不忽略该告警，也不因此升级保留的 Vue 依赖。
+TODO: [Minimatch 告警 GHSA-g3hv-75wg-m249](https://github.com/isaacs/minimatch/security/advisories/GHSA-g3hv-75wg-m249) 仍影响 Nx、ESLint、Vue 类型工具和 `editorconfig` 使用的 9/10 系列。恶意模式在 `optimizationLevel: 2` 时可造成资源耗尽。修复版 11 删除了 Nx 正在使用的 `makeRe` 等 API，不能全局 override。待上游兼容升级或单独验证保留旧 API 的安全回补后解除；不忽略该告警，也不因此升级保留的 Vue 依赖。
 
-TODO: `@vue/test-utils → js-beautify → glob 13.0.6` 存在 [GHSA-3g3m-2fjr-6pw4](https://github.com/isaacs/node-glob/security/advisories/GHSA-3g3m-2fjr-6pw4)：使用 `AbortSignal` 限制遍历时，取消后可能继续消耗文件系统 I/O 和 CPU。当前 `js-beautify` CLI 使用不带 signal 的同步调用，未发现项目运行该 CLI，但漏洞版本仍在依赖树中。待上游引入修复版 `glob >=14.0.2` 或完成兼容回补与回归验证后解除；与 Minimatch 工具链适配一起评估。
+TODO: 为修复 [glob 取消遍历告警 GHSA-3g3m-2fjr-6pw4](https://github.com/isaacs/node-glob/security/advisories/GHSA-3g3m-2fjr-6pw4)，[pnpm-workspace.yaml](pnpm-workspace.yaml) 仅将 `js-beautify@2.0.3` 的 `glob` 固定为 `14.0.4`，超出上游声明的 `^13.0.6`。升级 `js-beautify` 时复查这条规则：上游移除该依赖或其声明范围可解析到修复版后，删除覆盖，核对锁文件并复验 CLI 文件匹配和忽略行为。
