@@ -217,6 +217,6 @@ PR 的汇总检查名为 `Quality`，其他事件为 `CI result`。Action 固定
 
 ### 依赖安全待办
 
-TODO: [Minimatch 告警 GHSA-g3hv-75wg-m249](https://github.com/isaacs/minimatch/security/advisories/GHSA-g3hv-75wg-m249) 仍影响 Nx、ESLint、Vue 类型工具和 `editorconfig` 使用的 9/10 系列。恶意模式在 `optimizationLevel: 2` 时可造成资源耗尽。修复版 11 删除了 Nx 正在使用的 `makeRe` 等 API，不能全局 override。待上游兼容升级或单独验证保留旧 API 的安全回补后解除；不忽略该告警，也不因此升级保留的 Vue 依赖。
+TODO: 暂缓修复 [Minimatch 告警 #20](https://github.com/Liranius/vue-nest-baseline/security/dependabot/20)，保留告警开放。受影响的 9/10 系列来自 Nx、ESLint、Vue 类型工具和 `editorconfig` 等开发依赖。当前 Nx 的 `makeRe()` 调用使用默认优化级别 1，项目暂不维护补丁或全局覆盖。上游发布兼容修复、生产依赖引入受影响版本，或发现外部可控的匹配模式传入 `optimizationLevel >= 2` 的调用时，重新评估。[决策依据](docs/knowledge/codex/decisions/Minimatch%20alert%2020%20deferral.md)
 
 TODO: 为修复 [glob 取消遍历告警 GHSA-3g3m-2fjr-6pw4](https://github.com/isaacs/node-glob/security/advisories/GHSA-3g3m-2fjr-6pw4)，[pnpm-workspace.yaml](pnpm-workspace.yaml) 仅将 `js-beautify@2.0.3` 的 `glob` 固定为 `14.0.4`，超出上游声明的 `^13.0.6`。升级 `js-beautify` 时复查这条规则：上游移除该依赖或其声明范围可解析到修复版后，删除覆盖，核对锁文件并复验 CLI 文件匹配和忽略行为。
