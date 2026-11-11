@@ -4,7 +4,7 @@ import { nxE2EPreset } from '@nx/playwright/preset';
 import { defineConfig, devices } from '@playwright/test';
 
 const webServerAddress = 'http://127.0.0.1:4173';
-const baseURL = process.env['BASE_URL'] || webServerAddress;
+const baseURL = process.env['CI'] ? webServerAddress : process.env['BASE_URL'] || webServerAddress;
 
 export default defineConfig({
   ...nxE2EPreset(import.meta.dirname, { testDir: './src' }),
