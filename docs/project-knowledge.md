@@ -114,4 +114,4 @@ pnpm exec nx run @baseline/source:knowledge-find -- 超时 重试 --limit 5
 
 同日补充运行时隔离修复验收：在污染项目映射、默认项目、配置目录、数据库及云模式环境变量后，真实 Basic Memory 的 CLI 项目列表和 doctor 仍确认当前 worktree 绑定；从 `apps/web` 执行配置中的两个 hook 命令均成功，未创建外部探测目录。38 项知识脚本测试、2 项 Web 单测、全量格式、lint、类型检查、构建及 Chromium 冒烟通过；未调整依赖版本。
 
-TODO: 本次未触发会话压缩，PreCompact 已完成本机命令验收及宿主启用、信任核对，但尚未观测真实压缩时的宿主调用。首次实际压缩时核对对应生命周期事件及后续 SessionStart 上下文，再更新本记录；当前不将其记为已完成压缩链路验收。
+2026-11-11 已验证宿主在自动压缩时调用 PreCompact，并在恢复会话时通过 SessionStart 加载项目上下文。生命周期收件箱中，同一 Codex 会话在当前 worktree 有 4 组配对事件，项目均为 `vue-nest-baseline`。最后一组发生在当日北京时间 17:44:05（`compaction_imminent`，`trigger=auto`）和 17:45:29（`session_started`，`trigger=compact`）。恢复后的会话实际收到了该项目的 Basic Memory 上下文，focus 为 `code/dev`。
