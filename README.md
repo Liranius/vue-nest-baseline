@@ -151,7 +151,7 @@ pnpm exec nx run @baseline/web-e2e:e2e --configuration=all
 
 E2E 目标先执行类型检查和构建，再由 Playwright 启动 `http://127.0.0.1:4173` 的全新生产预览，结束后关闭服务。
 端口占用时失败，不复用已有服务。E2E 结果不缓存，构建和类型检查仍可使用缓存；使用上述 Nx 入口以确保前置任务执行。
-`BASE_URL` 只改变测试访问地址，本地预览仍会启动；验证当前工作区产物时保持该变量未设置。
+`CI` 为非空值时，浏览器始终访问本次构建的预览。本地默认访问同一预览，也可用 `BASE_URL` 指向已有服务。覆盖访问地址时，Playwright 仍会启动本地预览。
 
 失败截图和 trace 位于 `apps/web-e2e/test-output/playwright/output/`，HTML 报告位于 `apps/web-e2e/test-output/playwright/report/`，不会自动打开。
 CI 在浏览器测试失败时上传报告，保留七天。配置入口为 [playwright.config.mts](apps/web-e2e/playwright.config.mts)。

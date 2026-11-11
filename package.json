@@ -144,6 +144,7 @@
         "inputs": [
           "{workspaceRoot}/scripts/**",
           "{workspaceRoot}/tests/**",
+          "{workspaceRoot}/apps/web-e2e/playwright.config.mts",
           "{workspaceRoot}/.codex/**",
           "{workspaceRoot}/vitest.config.mts",
           "{workspaceRoot}/tsconfig*.json",
