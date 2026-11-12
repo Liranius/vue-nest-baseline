@@ -68,7 +68,8 @@ Nx 会在相关任务执行前同步 TypeScript 项目引用；需要手动同�
 ### 环境变量
 
 [apps/web/env/.env](apps/web/env/.env) 提供公共默认值，包括用于浏览器标题的 `VITE_APP_TITLE`，无需复制文件即可启动。
-个人覆盖可参考 [.env.example](apps/web/env/.env.example) 创建同目录下的 `.env.local`；本地和模式覆盖文件均被 Git 忽略。
+个人覆盖可参考 [.env.example](apps/web/env/.env.example) 创建同目录下的 `.env.local`。
+Git 默认忽略各目录的 `.env` 和模式覆盖文件，只放行该 Web 公共默认文件及各目录的 `.env.example` 示例。
 `VITE_*` 会进入客户端产物，只用于公开配置。
 
 Vite 的 `envDir` 指向 `apps/web/env`，避免 Nx 提前加载应用根目录的环境变量而改变模式优先级。
@@ -92,6 +93,7 @@ Vite 的 `envDir` 指向 `apps/web/env`，避免 Nx 提前加载应用根目录�
 ### 类型检查
 
 `@baseline/web:build` 依赖 `build-only` 与 `typecheck`；`preview` 和 `serve-static` 依赖完整的 `build`。
+`build-only` 在 Nx 推导的缓存输入上追加根 TypeScript 配置、包清单、pnpm 工作区与锁文件，以及根 PostCSS 配置。若构建配置引入新的共享文件，也要把它加入该目标的输入。
 Web 类型检查覆盖应用、单元测试和 Vite 配置，并先执行根 Vitest 配置的类型检查；E2E 项目单独检查浏览器测试与 Playwright 配置。
 
 浏览器配置继承 `@vue/tsconfig` 并开启 `noUncheckedIndexedAccess`；Node 配置继承 `@tsconfig/node24`。

@@ -18,7 +18,16 @@
       "dependsOn": ["build-only", "typecheck"]
     },
     "build-only": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "inputs": [
+        "...",
+        "{workspaceRoot}/tsconfig*.json",
+        "{workspaceRoot}/package.json",
+        "{workspaceRoot}/pnpm-lock.yaml",
+        "{workspaceRoot}/pnpm-workspace.yaml",
+        "{workspaceRoot}/postcss.config.*",
+        "{workspaceRoot}/.postcssrc*"
+      ]
     },
     "typecheck": {
       "dependsOn": ["^typecheck", { "projects": ["@baseline/source"], "target": "typecheck" }],
