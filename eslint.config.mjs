@@ -39,8 +39,8 @@ export default withVueTs(
   },
   {
     files: [
-      '*.config.{js,mjs,cjs,ts,mts,cts}',
-      'scripts/**/*.{js,mjs,cjs}',
+      '*.{js,mjs,cjs,ts,mts,cts}',
+      '{config,scripts}/**/*.{js,mjs,cjs,ts,mts,cts}',
       'apps/*/*.config.{js,mjs,cjs,ts,mts,cts}',
       'apps/web-e2e/**/*.{js,mjs,cjs,ts,mts,cts}',
     ],

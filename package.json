@@ -98,9 +98,8 @@
         "cache": true,
         "dependsOn": [],
         "inputs": [
-          "{workspaceRoot}/*.config.{ts,mts,cts}",
-          "{workspaceRoot}/config/**/*.{ts,mts,cts}",
-          "{workspaceRoot}/tests/**/*.ts",
+          "{workspaceRoot}/*.{ts,mts,cts}",
+          "{workspaceRoot}/{config,scripts,tests}/**/*.{ts,mts,cts,tsx}",
           "{workspaceRoot}/tsconfig.base.json",
           "{workspaceRoot}/tsconfig.node.json",
           "{workspaceRoot}/package.json",
@@ -227,32 +226,31 @@
         "executor": "nx:run-commands",
         "cache": false,
         "options": {
-          "commands": [
-            "oxlint eslint.config.mjs stylelint.config.mjs commitlint.config.mjs vitest.config.mts scripts tests --fix",
-            "eslint eslint.config.mjs stylelint.config.mjs commitlint.config.mjs vitest.config.mts scripts tests --fix"
-          ],
-          "parallel": false,
+          "command": "node scripts/lint-root.mjs --fix",
           "forwardAllArgs": false
-        }
+        },
+        "inputs": [
+          "rootLintInputs"
+        ]
       },
       "lint": {
         "executor": "nx:run-commands",
         "cache": true,
         "inputs": [
-          "lintGlobals",
-          "{workspaceRoot}/*.config.{js,mjs,cjs,ts,mts,cts}",
-          "{workspaceRoot}/scripts/**",
-          "{workspaceRoot}/tests/**",
-          "{workspaceRoot}/tsconfig.json"
+          "rootLintInputs"
         ],
         "options": {
-          "commands": [
-            "oxlint eslint.config.mjs stylelint.config.mjs commitlint.config.mjs vitest.config.mts scripts tests",
-            "eslint eslint.config.mjs stylelint.config.mjs commitlint.config.mjs vitest.config.mts scripts tests"
-          ],
-          "parallel": false
+          "command": "node scripts/lint-root.mjs",
+          "forwardAllArgs": false
         }
       }
+    },
+    "namedInputs": {
+      "rootLintInputs": [
+        "lintGlobals",
+        "{workspaceRoot}/*.{js,mjs,cjs,ts,mts,cts}",
+        "{workspaceRoot}/{config,scripts,tests}/**/*.{js,mjs,cjs,jsx,ts,mts,cts,tsx,vue}"
+      ]
     }
   }
 }

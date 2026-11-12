@@ -161,8 +161,9 @@ CI 在浏览器测试失败时上传报告，保留七天。配置入口为 [pla
 
 ## 质量检查与提交
 
-Oxfmt 是格式化工具，配置见 [.oxfmtrc.json](.oxfmtrc.json)。Web lint 包含 Oxlint、支持类型检查的 ESLint、Vue/Vitest 规则及 Stylelint；E2E 启用 Playwright 规则。
-Web 和 E2E 的 lint 都包含根配置检查。`eslint-config-prettier` 用于关闭冲突的格式规则，`eslint-plugin-oxlint` 关闭与 Oxlint 重复的规则。
+Oxfmt 是格式化工具，配置见 [.oxfmtrc.json](.oxfmtrc.json)。Web lint 包含 Oxlint、支持类型检查的 ESLint、Vue/Vitest 规则及 Stylelint。Web E2E 启用 Playwright 规则。
+根项目的 `lint` 与 `lint-fix` 对同一组文件依次运行 Oxlint 和 ESLint。仓库顶层的 JS/TS 文件以及 `config/`、`scripts/`、`tests/` 中的源码由 [根项目的 `rootLintInputs`](package.json) 统一匹配，并参与 Nx 的 lint 缓存计算。
+Web 和 Web E2E 的 lint 都包含根配置检查。`eslint-config-prettier` 用于关闭冲突的格式规则，`eslint-plugin-oxlint` 关闭与 Oxlint 重复的规则。
 生成物和收录的第三方技能目录被排除，项目自有代码、配置和文档仍接受检查。
 
 `lint` 和 `format-check` 为只读检查。`lint-fix` 不缓存，顺序执行适用的 Oxlint、ESLint、Stylelint 修复；剩余错误会使任务失败，已完成的修复保留。

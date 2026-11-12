@@ -8,13 +8,5 @@
     "outDir": "out-tsc/node",
     "tsBuildInfoFile": "out-tsc/node/tsconfig.node.tsbuildinfo"
   },
-  "include": [
-    "*.config.ts",
-    "*.config.mts",
-    "*.config.cts",
-    "config/**/*.ts",
-    "config/**/*.mts",
-    "config/**/*.cts",
-    "tests/**/*.ts"
-  ]
+  "include": ["*.ts", "*.mts", "*.cts", "config", "scripts", "tests"]
 }
