@@ -1,0 +1,16 @@
+{
+  "name": "@baseline/api-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "implicitDependencies": ["@baseline/api"],
+  "projectType": "application",
+  "targets": {
+    "e2e": {
+      "command": "jest --passWithNoTests",
+      "options": {
+        "cwd": "apps/api-e2e"
+      },
+      "outputs": ["{workspaceRoot}/coverage/{e2eProjectRoot}"],
+      "dependsOn": ["@baseline/api:build", "@baseline/api:serve"]
+    }
+  }
+}

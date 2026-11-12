@@ -38,6 +38,7 @@ Node 固定版本为 [.node-version](.node-version) 中的 `24.22.2`，pnpm 为 
 [pnpm-workspace.yaml](pnpm-workspace.yaml) 开启严格 engine、peer 检查及精确依赖版本；升级时同步版本声明和锁文件，按实际需要维护安装脚本允许列表。
 
 开发服务默认使用 `http://localhost:4200`，预览默认使用 `http://localhost:4300`，实际地址以终端输出为准。
+联调 Nest 接口时，在另一终端运行 `pnpm exec nx run @baseline/api:serve`。Vue 页面可直接调用 `fetch('/api')`，开发服务器会保留请求路径并转发到 `http://localhost:3000`。
 编辑器扩展见 [.vscode/extensions.json](.vscode/extensions.json)；[.editorconfig](.editorconfig) 约定 UTF-8、两空格、LF 和行末换行，[.gitattributes](.gitattributes) 保留 Windows 脚本的 CRLF。
 
 ## 常用命令
