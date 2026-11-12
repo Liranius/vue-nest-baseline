@@ -1,6 +1,6 @@
 # vue-nest-baseline
 
-Nx monorepo 工程基准，当前包含 Vue 3、Vite、TypeScript、Vue Router、Pinia 应用及 Playwright 浏览器测试。
+Nx monorepo 工程基准，包含 Vue 前端和 Nest API。前端使用 Vue 3、Vite、TypeScript、Vue Router 和 Pinia，浏览器测试使用 Playwright，API 端到端测试使用 Jest。
 项目自有代码采用 [MIT 许可证](LICENSE)；收录的第三方材料及许可见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 
 ## 项目与目录
@@ -10,6 +10,12 @@ Nx monorepo 工程基准，当前包含 Vue 3、Vite、TypeScript、Vue Router�
 | `@baseline/source`  | [package.json](package.json) | 工作区格式、根配置 lint、类型检查和 Git 钩子目标                                        |
 | `@baseline/web`     | [apps/web](apps/web)         | Vue 应用，入口为 [main.ts](apps/web/src/main.ts) 和 [App.vue](apps/web/src/app/App.vue) |
 | `@baseline/web-e2e` | [apps/web-e2e](apps/web-e2e) | Chromium 冒烟及多浏览器测试                                                             |
+| `@baseline/api`     | [apps/api](apps/api)         | Nest API 服务，入口为 [main.ts](apps/api/src/main.ts)                                   |
+| `@baseline/api-e2e` | [apps/api-e2e](apps/api-e2e) | 使用 Jest 测试运行中的 API                                                              |
+
+[根 package.json](package.json) 集中声明 Vue、Vue Router 和 Pinia 的运行依赖。Web 应用从仓库根安装依赖，由 Vite 打包交付。新增或升级 Web 运行依赖时更新根清单和锁文件。
+
+[pnpm workspace](pnpm-workspace.yaml) 当前的四个成员为根包、`apps/web`、`apps/api` 和 `apps/api-e2e`。`packages/*` 为后续共享包保留匹配规则。`@baseline/web-e2e` 是独立的 Nx 测试项目，使用根包的 Playwright 依赖，从仓库根运行 `pnpm exec nx run @baseline/web-e2e:e2e`。可用 `pnpm list -r --depth -1` 查询 pnpm 成员。
 
 路由位于 [router](apps/web/src/router)，状态示例位于 [stores](apps/web/src/stores)。单元测试与源码相邻，浏览器测试位于 [apps/web-e2e/src](apps/web-e2e/src)。
 项目目标由 Nx 插件推导和显式配置共同组成，查询时使用完整解析结果：
